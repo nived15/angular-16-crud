@@ -1,1688 +1,1939 @@
-# Angular 16 to Angular 20 Migration Plan
-## Project: Angular 16 CRUD Example - Strategic Implementation Plan
+# Angular 16 to 20 Migration Plan
+## Project: Angular 16 CRUD Example - Strategic Execution Plan
 
-**Plan Version:** 1.0  
-**Planning Date:** February 15, 2026  
-**Planned By:** Migration Planning Agent  
-**Target Completion:** March 8, 2026 (3 weeks)  
-**Project Sponsor:** [To be assigned]  
-**Technical Lead:** [To be assigned]
+**Plan Created:** February 15, 2026  
+**Planning Agent:** Migration Planning Agent  
+**Project Code:** ANG20-MIGRATION-001  
+**Target Completion:** March 8, 2026 (3 weeks)
 
 ---
 
-## Executive Summary
+## 📋 Executive Summary
 
-This plan outlines a structured, phased approach to migrate the Angular 16 CRUD application to Angular 20, transitioning from a legacy module-based architecture to a modern, standalone, Signal-driven paradigm. The migration represents a **medium-complexity, medium-risk** initiative requiring **26-36 developer hours** over a **3-week period**.
+This document provides a comprehensive, actionable migration plan for upgrading the Angular 16 CRUD application to Angular 20. The plan is based on the detailed assessment report and outlines a strategic, phased approach designed to minimize risk while maximizing efficiency.
 
-### Strategic Goals
-1. **Modernize Architecture:** Eliminate all NgModules in favor of standalone components
-2. **Enhance Performance:** Achieve 15-30% performance improvement through zoneless architecture
-3. **Improve Developer Experience:** Leverage Signals for simpler, more reactive state management
-4. **Future-Proof Codebase:** Align with Angular's long-term direction (2026-2029)
-5. **Maintain Quality:** Zero regression in functionality, maintain >80% test coverage
+### Project Scope
+- **Components to Migrate:** 4 (AppComponent + 3 feature components)
+- **Services to Modernize:** 1 (TutorialService)
+- **Modules to Eliminate:** 2 (AppModule, AppRoutingModule)
+- **Templates to Update:** 4 (control flow syntax migration)
+- **Configuration Files:** 5 (main.ts, angular.json, tsconfig.json, package.json, routes)
 
-### Key Success Metrics
-- ✅ 100% standalone components (4 components)
-- ✅ 0 NgModule files remaining
-- ✅ Bundle size reduction: -10% to -15%
-- ✅ Performance improvement: +15% to +30%
-- ✅ Zero critical bugs post-deployment
-- ✅ All 21 unit tests passing
+### Key Objectives
+1. ✅ Migrate from module-based to standalone architecture
+2. ✅ Convert all state management to Signals
+3. ✅ Modernize control flow syntax (`*ngIf`/`*ngFor` → `@if`/`@for`)
+4. ✅ Replace constructor-based DI with `inject()` function
+5. ✅ Implement OnPush change detection across all components
+6. ✅ Prepare for optional zoneless mode
+7. ✅ Maintain 100% functional parity with zero regressions
 
----
-
-## 1. Project Overview
-
-### 1.1 Current State Summary
-
-**Codebase Characteristics:**
-- **Framework Version:** Angular 16.0.0
-- **Architecture Pattern:** Module-based with constructor DI
-- **Components:** 4 (AppComponent + 3 feature components)
-- **Services:** 1 (TutorialService)
-- **Modules:** 2 (AppModule, AppRoutingModule)
-- **Routes:** 4 distinct routes
-- **Test Coverage:** Baseline established with Jasmine/Karma
-- **Lines of Code:** ~248 TypeScript lines to migrate
-
-**Technical Debt Identified:**
-- 100% module-based (no standalone components)
-- 100% legacy control flow syntax (`*ngIf`, `*ngFor`)
-- 100% constructor-based DI (no `inject()` usage)
-- 0% Signal adoption (all traditional state management)
-- Template-driven forms with limited reactivity
-- Some usage of `any` types in service layer
-
-### 1.2 Migration Scope
-
-**In Scope:**
-- ✅ Upgrade Angular core from 16.0.0 to 20.x
-- ✅ Convert all components to standalone architecture
-- ✅ Migrate all state to Signals
-- ✅ Replace `@Input()` and `@Output()` with `input()` and `output()`
-- ✅ Convert all templates to modern control flow (`@if`, `@for`, `@switch`)
-- ✅ Replace constructor DI with `inject()` function
-- ✅ Implement OnPush change detection across all components
-- ✅ Eliminate AppModule and AppRoutingModule
-- ✅ Update main.ts to standalone bootstrap
-- ✅ Migrate to provideHttpClient() and provideRouter()
-- ✅ Update all unit tests for new patterns
-- ✅ Implement zoneless change detection (optional Phase 6)
-
-**Out of Scope:**
-- ❌ Migration to Reactive Forms (can be future enhancement)
-- ❌ Bootstrap upgrade from 4.6.2 to 5.x
-- ❌ Addition of state management library (NgRx, Akita)
-- ❌ Lazy loading implementation
-- ❌ PWA capabilities
-- ❌ E2E test framework migration (Protractor → Cypress/Playwright)
-- ❌ Backend API changes
-- ❌ Database schema modifications
-
-**Dependencies:**
-- Node.js 18+ (required for Angular 20)
-- Angular CLI 20.x
-- TypeScript 5.0+ (already in place)
-- All existing third-party libraries (Bootstrap 4.6.2, RxJS 7.8.0)
+### Success Criteria
+- Zero TypeScript compilation errors
+- 100% test pass rate (all existing tests updated and passing)
+- All CRUD operations functioning correctly
+- Bundle size reduced by 10-15%
+- Performance maintained or improved
+- Clean code with zero legacy patterns
 
 ---
 
-## 2. Current State Analysis
+## 📊 Current State Analysis
 
-### 2.1 Assessment Report Key Findings
+### Assessment Summary
+**Source:** [Assessment Report](./assessment-report.md) - Generated February 15, 2026
 
-**Migration Readiness Score: 65/100**
+#### Migration Readiness Score: 65/100
 
-**Strengths (+):**
-- ✅ Clean component structure with good separation of concerns
+**Strengths:**
+- ✅ Clean component architecture with clear separation of concerns
 - ✅ TypeScript strict mode enabled
 - ✅ Standard Angular CLI project structure
-- ✅ Service already uses `providedIn: 'root'`
-- ✅ Modern TypeScript version (5.0.2)
-- ✅ Good foundation for testing
+- ✅ Service already using `providedIn: 'root'`
+- ✅ Good foundation for migration
 
-**Weaknesses (-):**
-- ❌ No Signal adoption (12 critical legacy patterns identified)
-- ❌ All constructor-based DI (6 instances across 4 components + 1 service)
-- ❌ Legacy control flow in all templates (15+ instances)
+**Weaknesses:**
+- ❌ 100% module-based architecture (no standalone components)
+- ❌ Zero Signal usage (all traditional state management)
+- ❌ Legacy control flow throughout all templates
+- ❌ Constructor-based dependency injection
 - ❌ No change detection optimization
-- ❌ Module-based architecture throughout
 
-### 2.2 Component Complexity Analysis
+#### Complexity Assessment by Component
 
-| Component | LOC | Complexity | Priority | Estimated Hours | Risk Level |
-|-----------|-----|------------|----------|----------------|------------|
-| AppComponent | 9 | LOW | HIGH | 0.5 | LOW |
-| AddTutorialComponent | 42 | MEDIUM | MEDIUM | 2-3 | MEDIUM |
-| TutorialsListComponent | 65 | HIGH | HIGH | 4-5 | MEDIUM |
-| TutorialDetailsComponent | 93 | HIGH | HIGH | 4-5 | HIGH |
-| TutorialService | 39 | LOW | MEDIUM | 1-2 | LOW |
+| Component | Lines of Code | Complexity | Priority | Est. Effort |
+|-----------|---------------|------------|----------|-------------|
+| AppComponent | 9 | LOW | HIGH | 30 min |
+| AddTutorialComponent | 42 | MEDIUM | MEDIUM | 2-3 hrs |
+| TutorialsListComponent | 65 | HIGH | HIGH | 4-5 hrs |
+| TutorialDetailsComponent | 93 | HIGH | HIGH | 4-5 hrs |
+| TutorialService | 39 | LOW | MEDIUM | 1-2 hrs |
 
-**Total Estimated Development Time:** 12-16 hours  
-**Total Estimated Testing Time:** 6-8 hours  
-**Total Estimated Documentation:** 2-3 hours  
-**Contingency Buffer (25%):** 5-7 hours  
-**Grand Total:** 25-34 hours
-
-### 2.3 Dependency Map
-
-```
-AppComponent (Root)
-├── Router Outlet
-│   ├── TutorialsListComponent
-│   │   └── TutorialService (inject)
-│   ├── TutorialDetailsComponent
-│   │   ├── TutorialService (inject)
-│   │   ├── ActivatedRoute (inject)
-│   │   └── Router (inject)
-│   └── AddTutorialComponent
-│       └── TutorialService (inject)
-└── App Routes
-```
-
-**Critical Path:**
-1. Update Angular CLI & Core → 2. Migrate AppComponent → 3. Eliminate Modules → 4. Migrate Feature Components → 5. Testing
+**Total Estimated Effort:** 16-24 hours of focused development
 
 ---
 
-## 3. Migration Strategy
+## 🎯 Migration Strategy
 
-### 3.1 Strategic Approach
+### Strategic Approach: "Incremental Modernization"
 
-**Chosen Strategy: Incremental, Phased Migration with Continuous Integration**
+We will follow a **bottom-up, incremental migration** strategy that progresses through 8 distinct phases. Each phase has clear entry/exit criteria, deliverables, and validation checkpoints.
 
-**Rationale:**
-- Minimizes risk through small, testable increments
-- Allows for continuous validation at each phase
-- Provides multiple rollback points
-- Enables parallel work streams where possible
-- Maintains application stability throughout migration
+### Core Principles
 
-**Alternative Strategies Considered:**
-1. **Big Bang Migration** - Rejected: Too risky, no intermediate validation
-2. **Parallel Codebase** - Rejected: Excessive overhead for small project
-3. **Component-by-Component in Production** - Rejected: Angular 16/20 incompatibility
+1. **Safety First:** Every phase includes rollback capability
+2. **Test-Driven:** All changes validated by tests before proceeding
+3. **Incremental Progress:** Small, verifiable steps rather than big-bang changes
+4. **Parallel Workstreams:** Independent tasks executed concurrently where possible
+5. **Continuous Validation:** Application remains functional after each phase
 
-### 3.2 Migration Phases Overview
+### Dependency Chain
 
-**8 Distinct Phases:**
+```
+Phase 1: Preparation
+    ↓
+Phase 2: Angular Core Update (BLOCKING for all others)
+    ↓
+Phase 3: Component Migration (can parallelize individual components)
+    ├── AppComponent (must complete first)
+    ├── AddTutorialComponent (parallel with Lists/Details)
+    ├── TutorialsListComponent (parallel with Add/Details)
+    └── TutorialDetailsComponent (parallel with Add/Lists)
+    ↓
+Phase 4: Module Elimination (depends on Phase 3 complete)
+    ↓
+Phase 5: Service Modernization (parallel with Phase 6)
+    ↓
+Phase 6: Zoneless Preparation (optional)
+    ↓
+Phase 7: Testing & QA (depends on all above)
+    ↓
+Phase 8: Documentation & Deployment
+```
 
-| Phase | Name | Duration | Deliverable | Gate Criteria |
-|-------|------|----------|-------------|---------------|
-| 1 | Pre-Migration Preparation | 2-3 hours | Clean baseline | All tests passing |
-| 2 | Angular Core Update | 3-4 hours | Working Angular 20 app | App loads without errors |
-| 3 | Standalone Components | 6-8 hours | 4 standalone components | All features functional |
-| 4 | Module Elimination | 1-2 hours | Zero module files | Full app working |
-| 5 | Service Modernization | 1-2 hours | Modernized service | Service tests passing |
-| 6 | Zoneless (Optional) | 2-3 hours | Zoneless app | Change detection verified |
-| 7 | Testing & QA | 3-4 hours | Test coverage report | >80% coverage |
-| 8 | Documentation & Deploy | 1-2 hours | Updated docs | Staging deployed |
+### Migration Philosophy
 
-**Total Timeline:** 19-28 hours (core) + 2-3 hours (optional) = **21-31 hours**
+**The "Signals-First" Mandate:**
+- Every property that changes MUST be a Signal
+- All `@Input()` becomes `input()`
+- All `@Output()` becomes `output()`
+- Observable-to-Signal conversion via `toSignal()`
 
-### 3.3 Work Stream Allocation
+**The "Standalone-Only" Rule:**
+- No new NgModules will be created
+- All components converted to `standalone: true`
+- Modules deleted after components are standalone
 
-**Sequential Work Streams (Cannot Parallelize):**
-- Phase 1 → Phase 2 → Phase 3 → Phase 4 → Phase 5 → Phase 7 → Phase 8
-
-**Potential Parallel Work Within Phase 3:**
-- Once AppComponent is standalone, 3 feature components can be migrated in parallel if resources allow
-
-**Recommended Team Structure:**
-- **Option A (Solo):** 1 developer, 3 weeks part-time (8-10 hrs/week)
-- **Option B (Accelerated):** 1 developer, 1.5 weeks full-time (dedicated)
-- **Option C (Team):** 1 lead + 1 developer, 1 week with parallel component work
+**The "Modern Control Flow" Requirement:**
+- Zero tolerance for `*ngIf`, `*ngFor`, `*ngSwitch`
+- 100% usage of `@if`, `@for`, `@switch`
+- All `@for` loops include `track` expression
 
 ---
 
-## 4. Detailed Phase Plan
+## 📅 Detailed Phase Plan
 
-### Phase 1: Pre-Migration Preparation
+### **PHASE 1: Pre-Migration Preparation**
 **Duration:** 2-3 hours  
-**Owner:** Technical Lead  
-**Prerequisite:** None  
-**Timeline:** Week 1, Day 1 (Feb 17, 2026)
+**Owner:** Lead Developer  
+**Parallel Work:** None (must complete first)
 
 #### Objectives
-- Establish clean baseline
-- Set up development infrastructure
-- Document current state
-- Prepare rollback mechanisms
+- Establish clean baseline for migration
+- Create safety nets for rollback
+- Validate current application state
+- Set up development environment
 
-#### Tasks
-| Task | Description | Duration | Owner | Completion Criteria |
-|------|-------------|----------|-------|---------------------|
-| 1.1 | Create git feature branch `feature/angular-20-migration` | 15 min | Lead Dev | Branch created, pushed |
-| 1.2 | Run full test suite, document results | 30 min | Lead Dev | All tests passing, baseline documented |
-| 1.3 | Create backup tag `v16-migration-start` | 10 min | Lead Dev | Tag created and pushed |
-| 1.4 | Update to latest Angular 16.x patch | 30 min | Lead Dev | Dependencies updated, tests passing |
-| 1.5 | Run dependency audit (`npm audit`) | 15 min | Lead Dev | No critical vulnerabilities |
-| 1.6 | Document current bundle size | 15 min | Lead Dev | Baseline metrics recorded |
-| 1.7 | Verify dev environment (Node 18+) | 15 min | Lead Dev | Environment validated |
-| 1.8 | Review migration plan with team | 45 min | All | Team aligned, questions addressed |
+#### Tasks Checklist
+
+- [ ] **1.1** Create full git backup of current codebase
+  - Create tag: `v1.0-angular-16-baseline`
+  - Push to remote repository
+  - Verify tag exists remotely
+
+- [ ] **1.2** Create feature branch
+  - Branch name: `feature/angular-20-migration`
+  - Ensure branched from latest `master`
+  - Set up branch protection (if applicable)
+
+- [ ] **1.3** Update to latest Angular 16.x patch
+  ```bash
+  ng update @angular/cli@16 @angular/core@16
+  ```
+  - Review and apply any pending Angular 16 migrations
+  - Verify application still compiles
+
+- [ ] **1.4** Run full test suite
+  ```bash
+  npm test
+  ```
+  - Document all test results (pass/fail count)
+  - Fix any existing failing tests
+  - Achieve 100% test pass rate before proceeding
+
+- [ ] **1.5** Create baseline metrics
+  - Run `ng build --configuration production`
+  - Document bundle sizes (main.js, vendor.js, etc.)
+  - Document build times
+  - Run Lighthouse audit and save report
+
+- [ ] **1.6** Set up development environment
+  - Verify Node.js version (18+ required for Angular 20)
+  - Clear npm cache: `npm cache clean --force`
+  - Update npm to latest: `npm install -g npm@latest`
+  - Verify Angular CLI: `ng version`
+
+- [ ] **1.7** Document current behavior
+  - Manually test all features and document expected behavior
+  - Take screenshots of each view
+  - Document any known bugs or quirks
 
 #### Deliverables
-- ✅ Feature branch created
-- ✅ Baseline test results documented
-- ✅ Git tag created for rollback
-- ✅ Dependencies audited
-- ✅ Bundle size baseline: ~500KB (estimated)
-- ✅ Team alignment achieved
+- ✅ Git tag: `v1.0-angular-16-baseline`
+- ✅ Feature branch: `feature/angular-20-migration`
+- ✅ Baseline test report (100% passing)
+- ✅ Baseline performance metrics
+- ✅ Documentation of current behavior
 
 #### Exit Criteria
-- All current tests passing (21/21)
-- Zero linting errors
-- Clean git working tree
-- Team approval to proceed
+- [ ] All tests passing (100% pass rate)
+- [ ] No compilation errors or warnings
+- [ ] Git branch created and pushed
+- [ ] Team approval to proceed to Phase 2
 
-#### Risk Mitigation
-- **Risk:** Outdated dependencies causing conflicts
-  - **Mitigation:** Update to latest 16.x patch first
-- **Risk:** Undiscovered bugs in current code
-  - **Mitigation:** Comprehensive test baseline documentation
+#### Risk Level: **LOW**
 
 ---
 
-### Phase 2: Angular Core Update
+### **PHASE 2: Angular Core Update**
 **Duration:** 3-4 hours  
-**Owner:** Technical Lead  
-**Prerequisite:** Phase 1 complete  
-**Timeline:** Week 1, Day 1-2 (Feb 17-18, 2026)
+**Owner:** Lead Developer  
+**Parallel Work:** None (blocking for subsequent phases)
 
 #### Objectives
-- Upgrade Angular from 16.0.0 to 20.x
-- Resolve automatic migration schemas
-- Ensure application compiles and runs on Angular 20
+- Update Angular from 16.x to 20.x
+- Resolve automatic migration schema changes
+- Ensure application compiles on Angular 20
+- Update third-party dependencies
 
-#### Tasks
-| Task | Description | Duration | Owner | Completion Criteria |
-|------|-------------|----------|-------|---------------------|
-| 2.1 | Backup package.json and package-lock.json | 5 min | Lead Dev | Files backed up |
-| 2.2 | Run `ng update @angular/cli@20 @angular/core@20` | 60 min | Lead Dev | Command completes successfully |
-| 2.3 | Review and apply automatic migration schemas | 45 min | Lead Dev | All schematics applied |
-| 2.4 | Install updated dependencies (`npm install`) | 15 min | Lead Dev | Dependencies installed |
-| 2.5 | Fix compilation errors from breaking changes | 60 min | Lead Dev | `ng build` succeeds |
-| 2.6 | Run `ng serve`, verify app loads | 15 min | Lead Dev | App serves on localhost |
-| 2.7 | Run test suite, fix any broken tests | 45 min | Lead Dev | Critical tests passing (>80%) |
-| 2.8 | Update tsconfig.json for Angular 20 | 15 min | Lead Dev | Compiler options optimized |
+#### Tasks Checklist
+
+- [ ] **2.1** Run Angular update command
+  ```bash
+  ng update @angular/cli@20 @angular/core@20
+  ```
+  - Review migration prompts carefully
+  - Accept or defer automatic changes (review each)
+  - Document any warnings or errors
+
+- [ ] **2.2** Update all Angular packages to v20
+  - Verify all `@angular/*` packages are at 20.x.x
+  - Check package.json for version consistency
+  - Run `npm install` to update node_modules
+
+- [ ] **2.3** Update TypeScript configuration
+  - Update `tsconfig.json` target to ES2022 or ES2023
+  - Update `lib` array to include latest ES features
+  - Review and update `compilerOptions` for Angular 20
+
+- [ ] **2.4** Update third-party dependencies
+  - Update RxJS if needed: `npm install rxjs@latest`
+  - Check Bootstrap compatibility (4.6.2 should work, consider upgrade)
+  - Update dev dependencies (Jasmine, Karma, etc.)
+
+- [ ] **2.5** Resolve compilation errors
+  - Run `ng build`
+  - Fix any breaking changes from Angular 17-20
+  - Address deprecated API usage warnings
+
+- [ ] **2.6** Verify application runs
+  ```bash
+  ng serve
+  ```
+  - Application should start without errors
+  - Access localhost:4200 and verify it loads
+  - Check browser console for runtime errors
+
+- [ ] **2.7** Run tests on Angular 20
+  ```bash
+  npm test
+  ```
+  - Some tests may fail due to breaking changes
+  - Document failing tests (DON'T fix yet, that's Phase 7)
+  - Verify no new compilation errors in test files
 
 #### Deliverables
-- ✅ Angular 20.x installed
-- ✅ All Angular packages updated to 20.x
-- ✅ Application compiles without errors
-- ✅ Application runs in dev mode
-- ✅ Core functionality verified manually
-
-#### Potential Breaking Changes
-- Deprecated APIs removed in Angular 17-20
-- RxJS operator changes (if any)
-- Router behavior updates
-- TypeScript compatibility issues
+- ✅ package.json updated with Angular 20 dependencies
+- ✅ Application compiles successfully
+- ✅ Application runs in browser (basic functionality)
+- ✅ Test compilation successful (tests may fail, that's OK)
 
 #### Exit Criteria
-- `ng serve` runs without errors
-- Application loads in browser
-- No console errors on initial load
-- At least 80% of tests passing (some may need Signal updates)
+- [ ] `ng serve` runs without compilation errors
+- [ ] Application loads in browser at localhost:4200
+- [ ] No critical console errors (warnings acceptable)
+- [ ] Commit: "chore: upgrade to Angular 20"
 
-#### Risk Mitigation
-- **Risk:** Third-party library incompatibility
-  - **Mitigation:** Check Angular compatibility guide, update or temporarily remove incompatible libraries
-- **Risk:** Unexpected breaking changes
-  - **Mitigation:** Review Angular 17-20 changelogs, have rollback plan ready
-
-#### Rollback Trigger
-- Application does not compile after 4 hours of troubleshooting
-- Critical third-party dependency has no Angular 20 compatible version
+#### Risk Level: **MEDIUM**
+**Mitigation:** Keep zone.js in place during this phase for stability
 
 ---
 
-### Phase 3: Standalone Components Migration
-**Duration:** 6-8 hours  
+### **PHASE 3: Standalone Components Migration**
+**Duration:** 10-14 hours (can parallelize after AppComponent)  
 **Owner:** Development Team  
-**Prerequisite:** Phase 2 complete  
-**Timeline:** Week 1-2, Day 2-5 (Feb 18-21, 2026)
+**Parallel Work:** After AppComponent, remaining 3 components can be done in parallel
 
-#### Objectives
-- Convert all 4 components to standalone
-- Migrate state to Signals
-- Replace constructor DI with `inject()`
-- Update templates to modern control flow
-- Implement OnPush change detection
-
-#### Sub-Phase 3.1: AppComponent Migration
-**Duration:** 30 minutes  
-**Priority:** CRITICAL (Blocks other components)
-
-**Tasks:**
-1. Add `standalone: true` to component decorator
-2. Add required imports (CommonModule if needed)
-3. Convert `title` property to `signal('Angular 16 Crud example')`
-4. Add `changeDetection: ChangeDetectionStrategy.OnPush`
-5. Update template if using `{{ title }}` → `{{ title() }}`
-6. Update unit test for standalone imports
-7. Run `ng serve` and verify
-
-**Success Criteria:** App loads, title displays correctly
-
-**File Changes:**
-- `app.component.ts` - 15 lines modified
-- `app.component.spec.ts` - 5 lines modified
+#### Phase 3 Overview
+This is the most substantial phase involving conversion of all components to standalone architecture with Signals. We'll follow a specific order based on dependencies.
 
 ---
 
-#### Sub-Phase 3.2: AddTutorialComponent Migration
+#### **PHASE 3.1: AppComponent Migration**
+**Duration:** 30-45 minutes  
+**Priority:** CRITICAL (must complete first)
+
+**Tasks:**
+- [ ] **3.1.1** Convert AppComponent to standalone
+  - Add `standalone: true` to `@Component` decorator
+  - Add `imports: [RouterOutlet]` (or other template dependencies)
+  - Remove from AppModule declarations
+
+- [ ] **3.1.2** Add OnPush change detection
+  - Import: `ChangeDetectionStrategy` from `@angular/core`
+  - Add: `changeDetection: ChangeDetectionStrategy.OnPush`
+
+- [ ] **3.1.3** Convert `title` property to Signal
+  ```typescript
+  title = signal('Angular 16 Crud example');
+  ```
+  - Update template if needed: `{{ title() }}`
+
+- [ ] **3.1.4** Update app.component.spec.ts
+  - Remove `TestBed.configureTestingModule({ declarations: [...] })`
+  - Use: `TestBed.configureTestingModule({ imports: [AppComponent] })`
+  - Verify tests pass
+
+**Deliverables:**
+- ✅ AppComponent is standalone
+- ✅ Uses OnPush change detection
+- ✅ Uses Signal for title
+- ✅ Tests passing
+
+**Exit Criteria:**
+- [ ] Component compiles without errors
+- [ ] `ng serve` runs successfully
+- [ ] Unit tests pass
+- [ ] Commit: "refactor: convert AppComponent to standalone with Signals"
+
+---
+
+#### **PHASE 3.2: AddTutorialComponent Migration**
 **Duration:** 2-3 hours  
-**Priority:** MEDIUM  
-**Dependency:** 3.1 complete
+**Can run in parallel with:** Phase 3.3 and 3.4 (different developers)
 
 **Tasks:**
-1. Add `standalone: true`, import `FormsModule`
-2. Replace `constructor(private tutorialService: TutorialService)` with:
-   ```typescript
-   private tutorialService = inject(TutorialService);
-   ```
-3. Convert properties to Signals:
-   ```typescript
-   tutorial = signal<Tutorial>({ title: '', description: '', published: false });
-   submitted = signal(false);
-   ```
-4. Update template control flow:
-   - `<div *ngIf="!submitted">` → `@if (!submitted()) {`
-   - `<div *ngIf="submitted">` → `@if (submitted()) {`
-5. Update form bindings for Signals (consider two-way binding patterns)
-6. Add `OnPush` change detection
-7. Update methods to use `.set()` and `.update()`:
-   ```typescript
-   saveTutorial(): void {
-     const data = { ...this.tutorial() };
-     // ... service call
-     this.submitted.set(true);
-   }
-   ```
-8. Update unit tests for standalone and Signals
-9. Manual test: Submit form, verify success message
+- [ ] **3.2.1** Convert to standalone
+  - Add `standalone: true`
+  - Add `imports: [FormsModule]` (for template-driven forms)
+  - Remove from AppModule declarations
 
-**Success Criteria:** Form submission works, success state displays
+- [ ] **3.2.2** Replace constructor DI
+  ```typescript
+  // Before: constructor(private tutorialService: TutorialService) {}
+  // After:
+  private tutorialService = inject(TutorialService);
+  ```
 
-**File Changes:**
-- `add-tutorial.component.ts` - 30 lines modified
-- `add-tutorial.component.html` - 10 lines modified
-- `add-tutorial.component.spec.ts` - 15 lines modified
+- [ ] **3.2.3** Convert properties to Signals
+  ```typescript
+  tutorial = signal<Tutorial>({
+    title: '',
+    description: '',
+    published: false
+  });
+  submitted = signal(false);
+  ```
 
-**Risks:**
-- Two-way binding with Signals may require model() instead of signal()
-- Mitigation: Use model() for form bindings or manual event handlers
+- [ ] **3.2.4** Update template control flow
+  - Replace `*ngIf="!submitted"` with `@if (!submitted())`
+  - Replace `*ngIf="submitted"` with `@if (submitted())`
+  - Update property bindings to use Signal accessors
+
+- [ ] **3.2.5** Update methods for Signal usage
+  ```typescript
+  saveTutorial(): void {
+    const data = this.tutorial();
+    this.tutorialService.create(data).subscribe({
+      next: (res) => {
+        this.submitted.set(true);
+      },
+      error: (e) => console.error(e)
+    });
+  }
+
+  newTutorial(): void {
+    this.submitted.set(false);
+    this.tutorial.set({
+      title: '',
+      description: '',
+      published: false
+    });
+  }
+  ```
+
+- [ ] **3.2.6** Add OnPush change detection
+  - `changeDetection: ChangeDetectionStrategy.OnPush`
+
+- [ ] **3.2.7** Consider Reactive Forms migration (OPTIONAL)
+  - Evaluate if two-way binding with Signals is sufficient
+  - If complex validation needed, migrate to Reactive Forms
+  - Decision point: Document choice in commit message
+
+- [ ] **3.2.8** Update add-tutorial.component.spec.ts
+  - Update TestBed imports
+  - Update test assertions for Signals
+  - Mock TutorialService properly
+  - Verify all tests pass
+
+**Deliverables:**
+- ✅ AddTutorialComponent is standalone
+- ✅ Uses inject() for DI
+- ✅ Uses Signals for state
+- ✅ Modern control flow in template
+- ✅ OnPush change detection
+- ✅ Tests passing
+
+**Exit Criteria:**
+- [ ] Component compiles without errors
+- [ ] Form submission works (manual test)
+- [ ] Success message displays correctly
+- [ ] Unit tests pass
+- [ ] Commit: "refactor: convert AddTutorialComponent to standalone with Signals"
 
 ---
 
-#### Sub-Phase 3.3: TutorialsListComponent Migration
+#### **PHASE 3.3: TutorialsListComponent Migration**
 **Duration:** 4-5 hours  
-**Priority:** HIGH  
-**Dependency:** 3.1 complete
+**Can run in parallel with:** Phase 3.2 and 3.4
 
 **Tasks:**
-1. Add `standalone: true`, import `CommonModule`, `FormsModule`
-2. Replace constructor DI with `inject(TutorialService)`
-3. Convert properties to Signals:
-   ```typescript
-   tutorials = signal<Tutorial[]>([]);
-   currentTutorial = signal<Tutorial | undefined>(undefined);
-   currentIndex = signal(-1);
-   title = signal('');
-   ```
-4. Update `ngOnInit` to use `toSignal()` or manual Signal updates:
-   ```typescript
-   ngOnInit(): void {
-     this.retrieveTutorials();
-   }
-   
-   retrieveTutorials(): void {
-     this.tutorialService.getAll().subscribe({
-       next: (data) => {
-         this.tutorials.set(data);
-       },
-       error: (e) => console.error(e)
-     });
-   }
-   ```
-5. Update template control flow:
-   - `*ngFor="let tutorial of tutorials; let i = index"` → 
-     `@for (tutorial of tutorials(); track tutorial.id; let i = $index)`
-   - All `*ngIf` → `@if`
-6. Update all method references to use Signal getters/setters
-7. Add `OnPush` change detection
-8. Update unit tests comprehensively
-9. Manual test: List, search, select, delete operations
+- [ ] **3.3.1** Convert to standalone
+  - Add `standalone: true`
+  - Add necessary imports (CommonModule may not be needed if using new control flow)
 
-**Success Criteria:** All list operations functional, search works, delete works
+- [ ] **3.3.2** Replace constructor DI
+  ```typescript
+  private tutorialService = inject(TutorialService);
+  ```
 
-**File Changes:**
-- `tutorials-list.component.ts` - 45 lines modified
-- `tutorials-list.component.html` - 20 lines modified
-- `tutorials-list.component.spec.ts` - 25 lines modified
+- [ ] **3.3.3** Convert all properties to Signals
+  ```typescript
+  tutorials = signal<Tutorial[]>([]);
+  currentTutorial = signal<Tutorial | undefined>(undefined);
+  currentIndex = signal(-1);
+  title = signal('');
+  ```
 
-**Risks:**
-- Complex state management with multiple Signals
-- Mitigation: Careful tracking of Signal dependencies, consider computed() for derived state
+- [ ] **3.3.4** Convert Observable subscriptions to Signals
+  - Option A: Use `toSignal()` utility
+    ```typescript
+    tutorials = toSignal(this.tutorialService.getAll(), { initialValue: [] });
+    ```
+  - Option B: Manual Signal updates
+    ```typescript
+    retrieveTutorials(): void {
+      this.tutorialService.getAll().subscribe({
+        next: (data) => {
+          this.tutorials.set(data);
+        },
+        error: (e) => console.error(e)
+      });
+    }
+    ```
+  - Decision: Document which approach works best
+
+- [ ] **3.3.5** Update methods for Signal usage
+  ```typescript
+  setActiveTutorial(tutorial: Tutorial, index: number): void {
+    this.currentTutorial.set(tutorial);
+    this.currentIndex.set(index);
+  }
+
+  searchTitle(): void {
+    this.currentTutorial.set(undefined);
+    this.currentIndex.set(-1);
+    
+    this.tutorialService.findByTitle(this.title()).subscribe({
+      next: (data) => {
+        this.tutorials.set(data);
+      },
+      error: (e) => console.error(e)
+    });
+  }
+  ```
+
+- [ ] **3.3.6** Update template control flow
+  - Replace `*ngFor="let tutorial of tutorials; let i = index"`
+  - With: `@for (tutorial of tutorials(); track tutorial.id; let i = $index)`
+  - Replace all `*ngIf` with `@if`
+  - Update property bindings to use Signal accessors
+
+- [ ] **3.3.7** Add OnPush change detection
+
+- [ ] **3.3.8** Update tutorials-list.component.spec.ts
+  - Update TestBed imports
+  - Mock TutorialService with Signal-compatible responses
+  - Update test assertions for Signals
+  - Test the `@for` loop rendering
+  - Verify all tests pass
+
+**Deliverables:**
+- ✅ TutorialsListComponent is standalone
+- ✅ Uses inject() for DI
+- ✅ All state managed with Signals
+- ✅ Modern control flow with `@for` (including track)
+- ✅ OnPush change detection
+- ✅ Tests passing
+
+**Exit Criteria:**
+- [ ] Component compiles without errors
+- [ ] List displays correctly
+- [ ] Search functionality works
+- [ ] Tutorial selection works
+- [ ] Delete operations work
+- [ ] Unit tests pass
+- [ ] Commit: "refactor: convert TutorialsListComponent to standalone with Signals"
 
 ---
 
-#### Sub-Phase 3.4: TutorialDetailsComponent Migration
+#### **PHASE 3.4: TutorialDetailsComponent Migration**
 **Duration:** 4-5 hours  
-**Priority:** HIGH  
-**Dependency:** 3.1 complete
+**Can run in parallel with:** Phase 3.2 and 3.3
 
 **Tasks:**
-1. Add `standalone: true`, import required modules
-2. Replace `@Input()` decorators with `input()`:
-   ```typescript
-   viewMode = input(false);
-   tutorial = input<Tutorial>({ title: '', description: '', published: false });
-   ```
-   **Note:** This changes component API - may need to use signals for route-driven inputs
-3. Replace constructor DI (3 services) with `inject()`:
-   ```typescript
-   private tutorialService = inject(TutorialService);
-   private route = inject(ActivatedRoute);
-   private router = inject(Router);
-   ```
-4. Convert `message` to `signal('')`
-5. Update template control flow:
-   - `*ngIf="viewMode; else editable"` → `@if (viewMode()) { ... } @else { ... }`
-   - Nested `*ngIf` → `@if`
-6. Consider using `toSignal()` for route params:
-   ```typescript
-   id = toSignal(this.route.paramMap.pipe(map(params => params.get('id'))));
-   ```
-7. Update all methods for Signal usage
-8. Add `OnPush` change detection
-9. Update unit tests - particularly for input Signals
-10. Manual test: View mode, edit mode, update, delete, navigation
+- [ ] **3.4.1** Convert to standalone
+  - Add `standalone: true`
+  - Add imports: `[FormsModule]` and any other template dependencies
 
-**Success Criteria:** View/edit toggle works, CRUD operations functional
+- [ ] **3.4.2** Replace `@Input()` with `input()`
+  ```typescript
+  // Before:
+  // @Input() viewMode = false;
+  // @Input() currentTutorial: Tutorial = { title: '', description: '', published: false };
+  
+  // After:
+  viewMode = input(false);
+  currentTutorial = input<Tutorial>({ 
+    title: '', 
+    description: '', 
+    published: false 
+  });
+  ```
 
-**File Changes:**
-- `tutorial-details.component.ts` - 55 lines modified
-- `tutorial-details.component.html` - 25 lines modified
-- `tutorial-details.component.spec.ts` - 30 lines modified
+- [ ] **3.4.3** Replace constructor DI with inject()
+  ```typescript
+  private tutorialService = inject(TutorialService);
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  ```
 
-**Risks:**
-- Route parameter integration with input signals
-- Mitigation: May need to use `withComponentInputBinding()` router feature or keep traditional ActivatedRoute approach
+- [ ] **3.4.4** Convert message property to Signal
+  ```typescript
+  message = signal('');
+  ```
+
+- [ ] **3.4.5** Update methods for Signal usage
+  ```typescript
+  updatePublished(status: boolean): void {
+    const data = {
+      ...this.currentTutorial(),
+      published: status
+    };
+
+    this.tutorialService
+      .update(this.currentTutorial().id, data)
+      .subscribe({
+        next: (res) => {
+          // Update currentTutorial through parent or refetch
+          this.message.set('The status was updated successfully!');
+        },
+        error: (e) => console.error(e)
+      });
+  }
+  ```
+
+- [ ] **3.4.6** Consider route params with Signals
+  - Option A: Use `toSignal()` with route params
+    ```typescript
+    private id = toSignal(this.route.params.pipe(map(p => p['id'])));
+    ```
+  - Option B: Keep traditional approach in ngOnInit
+  - Decision: Document approach
+
+- [ ] **3.4.7** Update template control flow
+  - Replace `*ngIf="viewMode; else editable"` with:
+    ```html
+    @if (viewMode()) {
+      <!-- view mode content -->
+    } @else {
+      <!-- edit mode content -->
+    }
+    ```
+  - Remove `<ng-template #editable>` wrapper
+  - Replace nested `*ngIf` with `@if`
+  - Update property bindings to use Signal accessors: `viewMode()`, `currentTutorial()`
+
+- [ ] **3.4.8** Add OnPush change detection
+
+- [ ] **3.4.9** Update tutorial-details.component.spec.ts
+  - Update TestBed imports
+  - Use `fixture.componentRef.setInput('viewMode', true)` for input testing
+  - Mock all three injected services
+  - Update assertions for Signals
+  - Verify all tests pass
+
+**Deliverables:**
+- ✅ TutorialDetailsComponent is standalone
+- ✅ Uses input() for component inputs
+- ✅ Uses inject() for all DI
+- ✅ Uses Signals for internal state
+- ✅ Modern control flow with @if/@else
+- ✅ OnPush change detection
+- ✅ Tests passing
+
+**Exit Criteria:**
+- [ ] Component compiles without errors
+- [ ] View mode displays correctly
+- [ ] Edit mode works
+- [ ] Update functionality works
+- [ ] Delete redirects correctly
+- [ ] Unit tests pass
+- [ ] Commit: "refactor: convert TutorialDetailsComponent to standalone with Signals"
 
 ---
 
-#### Phase 3 Deliverables
+#### **Phase 3 Summary & Validation**
+
+**After ALL Phase 3 sub-phases complete:**
+
+- [ ] **3.5.1** Run full application smoke test
+  - Start app: `ng serve`
+  - Test complete user flow:
+    1. View empty tutorial list
+    2. Create new tutorial
+    3. View tutorial list with item
+    4. Click on tutorial to view details
+    5. Edit tutorial
+    6. Update published status
+    7. Search tutorials
+    8. Delete individual tutorial
+    9. Delete all tutorials
+
+- [ ] **3.5.2** Verify all components are standalone
+  - Search codebase for `standalone: true` (should find 4 instances)
+  - Search for `standalone: false` or missing standalone (should find 0)
+
+- [ ] **3.5.3** Verify no legacy control flow
+  - Search for `*ngIf` in templates (should find 0)
+  - Search for `*ngFor` in templates (should find 0)
+  - Search for `*ngSwitch` in templates (should find 0)
+
+- [ ] **3.5.4** Verify all @for loops have track
+  - Review all `@for` usage
+  - Ensure each has `track` expression
+
+- [ ] **3.5.5** Run all tests
+  ```bash
+  npm test
+  ```
+  - Target: 100% pass rate for component tests
+
+**Phase 3 Deliverables:**
 - ✅ All 4 components converted to standalone
-- ✅ All state migrated to Signals
-- ✅ All DI using `inject()`
-- ✅ All templates using modern control flow
-- ✅ All components using OnPush
-- ✅ All unit tests updated and passing
+- ✅ All components use Signals for state
+- ✅ All components use inject() for DI
+- ✅ All components use OnPush change detection
+- ✅ All templates use modern control flow
+- ✅ All component tests passing
 
-#### Phase 3 Exit Criteria
-- All components compile without warnings
-- Full application manually tested and functional
-- Unit test pass rate >90%
-- No console errors during normal operations
+**Phase 3 Exit Criteria:**
+- [ ] Every component has `standalone: true`
+- [ ] Zero legacy control flow in templates
+- [ ] All tests passing
+- [ ] Full application functionality verified manually
+- [ ] Commit: "refactor: complete Phase 3 - all components standalone with Signals"
 
 ---
 
-### Phase 4: Module Elimination
+### **PHASE 4: Module Elimination**
 **Duration:** 1-2 hours  
-**Owner:** Technical Lead  
-**Prerequisite:** Phase 3 complete  
-**Timeline:** Week 2, Day 5 (Feb 21, 2026)
+**Owner:** Lead Developer  
+**Parallel Work:** None (depends on Phase 3 complete)
 
 #### Objectives
-- Eliminate AppModule and AppRoutingModule
-- Update main.ts to standalone bootstrap
-- Configure providers at application level
+- Remove all NgModule files
+- Update main.ts for standalone bootstrap
+- Configure providers for HTTP and routing
+- Verify application still works without modules
 
-#### Tasks
-| Task | Description | Duration | Owner | Completion Criteria |
-|------|-------------|----------|-------|---------------------|
-| 4.1 | Create `app.routes.ts` file | 20 min | Lead Dev | Routes exported as const |
-| 4.2 | Extract routes from AppRoutingModule | 15 min | Lead Dev | All 4 routes in new file |
-| 4.3 | Rewrite `main.ts` for standalone bootstrap | 30 min | Lead Dev | Uses bootstrapApplication() |
-| 4.4 | Add `provideRouter(routes)` | 10 min | Lead Dev | Router configured |
-| 4.5 | Add `provideHttpClient()` | 10 min | Lead Dev | HTTP configured |
-| 4.6 | Add `provideZoneChangeDetection()` | 10 min | Lead Dev | Zone.js configured |
-| 4.7 | Delete `app.module.ts` | 5 min | Lead Dev | File removed |
-| 4.8 | Delete `app-routing.module.ts` | 5 min | Lead Dev | File removed |
-| 4.9 | Remove module imports from components | 15 min | Lead Dev | No module references remain |
-| 4.10 | Test all routes and navigation | 20 min | Lead Dev | All routes work |
+#### Tasks Checklist
 
-#### New main.ts Implementation
-```typescript
-import { bootstrapApplication } from '@angular/platform-browser';
-import { provideRouter } from '@angular/router';
-import { provideHttpClient } from '@angular/common/http';
-import { provideZoneChangeDetection } from '@angular/core';
-import { AppComponent } from './app/app.component';
-import { routes } from './app/app.routes';
+- [ ] **4.1** Create app.routes.ts
+  - Create new file: `src/app/app.routes.ts`
+  - Export routes array from app-routing.module.ts:
+    ```typescript
+    import { Routes } from '@angular/router';
+    import { TutorialsListComponent } from './components/tutorials-list/tutorials-list.component';
+    import { TutorialDetailsComponent } from './components/tutorial-details/tutorial-details.component';
+    import { AddTutorialComponent } from './components/add-tutorial/add-tutorial.component';
 
-bootstrapApplication(AppComponent, {
-  providers: [
-    provideRouter(routes),
-    provideHttpClient(),
-    provideZoneChangeDetection({ eventCoalescing: true })
-  ]
-}).catch(err => console.error(err));
-```
+    export const routes: Routes = [
+      { path: '', redirectTo: 'tutorials', pathMatch: 'full' },
+      { path: 'tutorials', component: TutorialsListComponent },
+      { path: 'tutorials/:id', component: TutorialDetailsComponent },
+      { path: 'add', component: AddTutorialComponent }
+    ];
+    ```
 
-#### New app.routes.ts Implementation
-```typescript
-import { Routes } from '@angular/router';
-import { TutorialsListComponent } from './components/tutorials-list/tutorials-list.component';
-import { TutorialDetailsComponent } from './components/tutorial-details/tutorial-details.component';
-import { AddTutorialComponent } from './components/add-tutorial/add-tutorial.component';
+- [ ] **4.2** Update main.ts for standalone bootstrap
+  - Replace entire file content:
+    ```typescript
+    import { bootstrapApplication } from '@angular/platform-browser';
+    import { provideRouter } from '@angular/router';
+    import { provideHttpClient } from '@angular/common/http';
+    import { provideZoneChangeDetection } from '@angular/core';
+    import { AppComponent } from './app/app.component';
+    import { routes } from './app/app.routes';
 
-export const routes: Routes = [
-  { path: '', redirectTo: 'tutorials', pathMatch: 'full' },
-  { path: 'tutorials', component: TutorialsListComponent },
-  { path: 'tutorials/:id', component: TutorialDetailsComponent },
-  { path: 'add', component: AddTutorialComponent }
-];
-```
+    bootstrapApplication(AppComponent, {
+      providers: [
+        provideZoneChangeDetection({ eventCoalescing: true }),
+        provideRouter(routes),
+        provideHttpClient()
+      ]
+    }).catch(err => console.error(err));
+    ```
+
+- [ ] **4.3** Update AppComponent template
+  - Ensure app.component.html has `<router-outlet></router-outlet>`
+  - Update AppComponent imports if needed:
+    ```typescript
+    imports: [RouterOutlet]
+    ```
+
+- [ ] **4.4** Delete app.module.ts
+  - Verify no other files import from app.module.ts
+  - Delete file: `src/app/app.module.ts`
+
+- [ ] **4.5** Delete app-routing.module.ts
+  - Verify routes are now in app.routes.ts
+  - Delete file: `src/app/app-routing.module.ts`
+
+- [ ] **4.6** Update angular.json (if needed)
+  - Check if `main` entry point is correct
+  - Verify polyfills configuration
+
+- [ ] **4.7** Search for any remaining module imports
+  - Search codebase for `.module.ts` files (should find 0 in src/app)
+  - Search for `@NgModule` imports (should find 0 in src/app)
+
+- [ ] **4.8** Test application
+  ```bash
+  ng serve
+  ```
+  - Verify application starts without errors
+  - Test all routes manually
+  - Verify HTTP calls still work
+
+- [ ] **4.9** Run tests
+  ```bash
+  npm test
+  ```
+  - Update any test files that reference modules
+  - Achieve 100% test pass rate
 
 #### Deliverables
-- ✅ `app.routes.ts` created
-- ✅ `main.ts` rewritten for standalone
-- ✅ `app.module.ts` deleted
-- ✅ `app-routing.module.ts` deleted
-- ✅ Zero module files in src/app
+- ✅ app.routes.ts created
+- ✅ main.ts updated for standalone bootstrap
+- ✅ app.module.ts deleted
+- ✅ app-routing.module.ts deleted
+- ✅ Application fully functional
 
 #### Exit Criteria
-- Application compiles without errors
-- All routes navigate correctly
-- HTTP calls functional
-- No references to NgModule anywhere in src/app
+- [ ] Zero `*.module.ts` files in src/app directory
+- [ ] `ng serve` runs without errors
+- [ ] All routes working correctly
+- [ ] HTTP service calls functional
+- [ ] All tests passing
+- [ ] Commit: "refactor: eliminate all NgModules, implement standalone bootstrap"
 
-#### Risk Mitigation
-- **Risk:** Provider configuration errors
-  - **Mitigation:** Follow official Angular docs exactly, test each route after changes
+#### Risk Level: **MEDIUM**
+**Mitigation:** Thorough testing of routing and HTTP functionality
 
 ---
 
-### Phase 5: Service Modernization
+### **PHASE 5: Service Modernization**
 **Duration:** 1-2 hours  
-**Owner:** Developer  
-**Prerequisite:** Phase 4 complete  
-**Timeline:** Week 2, Day 5 (Feb 21, 2026)
+**Owner:** Developer (any team member)  
+**Parallel Work:** Can run parallel with Phase 6
 
 #### Objectives
-- Update TutorialService to use `inject()`
-- Remove `any` types, improve type safety
-- Optionally create Signal-based service wrappers
+- Modernize TutorialService to use inject()
+- Improve type safety (remove `any` types)
+- Optional: Add Signal-based service state
 
-#### Tasks
-| Task | Description | Duration | Owner | Completion Criteria |
-|------|-------------|----------|-------|---------------------|
-| 5.1 | Replace `constructor(private http: HttpClient)` with `inject()` | 15 min | Developer | Service uses inject() |
-| 5.2 | Update method signatures to remove `any` | 30 min | Developer | All methods strongly typed |
-| 5.3 | Add JSDoc comments for all public methods | 20 min | Developer | Documentation complete |
-| 5.4 | Update service unit tests | 30 min | Developer | All service tests passing |
-| 5.5 | (Optional) Create Signal-based wrappers | 60 min | Developer | Signal service pattern implemented |
-| 5.6 | Manual integration test of all service methods | 15 min | Developer | CRUD operations verified |
+#### Tasks Checklist
 
-#### Updated Service Pattern
-```typescript
-import { Injectable, inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
-import { Tutorial } from '../models/tutorial.model';
+- [ ] **5.1** Replace constructor DI in TutorialService
+  ```typescript
+  // Before:
+  // constructor(private http: HttpClient) {}
 
-@Injectable({
-  providedIn: 'root'
-})
-export class TutorialService {
+  // After:
+  import { inject } from '@angular/core';
+  
   private http = inject(HttpClient);
-  private baseUrl = 'http://localhost:8080/api/tutorials';
+  ```
 
-  /**
-   * Retrieve all tutorials
-   */
-  getAll(): Observable<Tutorial[]> {
-    return this.http.get<Tutorial[]>(this.baseUrl);
-  }
+- [ ] **5.2** Improve type safety
+  - Replace `Observable<any>` with proper types:
+    ```typescript
+    getAll(): Observable<Tutorial[]>
+    get(id: string): Observable<Tutorial>
+    create(data: Tutorial): Observable<Tutorial>
+    update(id: string, data: Partial<Tutorial>): Observable<Tutorial>
+    delete(id: string): Observable<void>
+    deleteAll(): Observable<void>
+    findByTitle(title: string): Observable<Tutorial[]>
+    ```
 
-  /**
-   * Retrieve a single tutorial by ID
-   */
-  get(id: string): Observable<Tutorial> {
-    return this.http.get<Tutorial>(`${this.baseUrl}/${id}`);
-  }
+- [ ] **5.3** Optional: Add Signal-based service state
+  - Consider adding a Signal store for tutorials
+    ```typescript
+    private tutorialsSignal = signal<Tutorial[]>([]);
+    public tutorials = this.tutorialsSignal.asReadonly();
+    
+    loadTutorials(): void {
+      this.getAll().subscribe(data => {
+        this.tutorialsSignal.set(data);
+      });
+    }
+    ```
+  - **Decision point:** Evaluate if needed based on app complexity
+  - Document decision in commit message
 
-  /**
-   * Create a new tutorial
-   */
-  create(data: Omit<Tutorial, 'id'>): Observable<Tutorial> {
-    return this.http.post<Tutorial>(this.baseUrl, data);
-  }
-
-  /**
-   * Update an existing tutorial
-   */
-  update(id: string, data: Partial<Tutorial>): Observable<Tutorial> {
-    return this.http.put<Tutorial>(`${this.baseUrl}/${id}`, data);
-  }
-
-  /**
-   * Delete a tutorial by ID
-   */
-  delete(id: string): Observable<void> {
-    return this.http.delete<void>(`${this.baseUrl}/${id}`);
-  }
-
-  /**
-   * Delete all tutorials
-   */
-  deleteAll(): Observable<void> {
-    return this.http.delete<void>(this.baseUrl);
-  }
-
-  /**
-   * Find tutorials by title
-   */
-  findByTitle(title: string): Observable<Tutorial[]> {
-    return this.http.get<Tutorial[]>(`${this.baseUrl}?title=${title}`);
-  }
-}
-```
+- [ ] **5.4** Update service tests (tutorial.service.spec.ts)
+  - Verify HttpClientTestingModule still works with inject()
+  - Update type expectations in tests
+  - Ensure 100% test pass rate
 
 #### Deliverables
-- ✅ TutorialService modernized
-- ✅ All methods strongly typed
+- ✅ TutorialService uses inject() for HttpClient
+- ✅ Fully typed service methods (no `any`)
+- ✅ Optional: Signal-based service state
 - ✅ Service tests passing
-- ✅ Optional: Signal-based service patterns
 
 #### Exit Criteria
-- Service compiles without warnings
-- All service unit tests passing
-- No usage of `any` type
-- Documentation complete
+- [ ] Service compiles without errors
+- [ ] No TypeScript `any` types in service
+- [ ] Service tests passing
+- [ ] Components still work with service
+- [ ] Commit: "refactor: modernize TutorialService with inject() and type safety"
+
+#### Risk Level: **LOW**
 
 ---
 
-### Phase 6: Zoneless Preparation (OPTIONAL)
+### **PHASE 6: Zoneless Preparation (OPTIONAL)**
 **Duration:** 2-3 hours  
-**Owner:** Technical Lead  
-**Prerequisite:** Phase 5 complete  
-**Timeline:** Week 3, Day 1-2 (Feb 24-25, 2026) - OPTIONAL
+**Owner:** Lead Developer  
+**Parallel Work:** Can run parallel with Phase 5
+
+⚠️ **NOTE:** This phase is OPTIONAL and can be deferred to a future iteration.
 
 #### Objectives
-- Enable experimental zoneless change detection
-- Remove zone.js dependency
-- Validate all change detection working correctly
+- Prepare application for zoneless mode
+- Test with experimental zoneless change detection
+- Validate all Signal-based change detection works
+- Remove dependency on zone.js
 
-⚠️ **RECOMMENDATION:** Skip this phase initially. Implement in a future iteration after core migration is stable.
+#### Tasks Checklist
 
-#### Tasks (If Pursued)
-1. Verify all components use Signals for reactivity
-2. Update `main.ts` to use `provideExperimentalZonelessChangeDetection()`
-3. Remove `zone.js` from polyfills in `angular.json`
-4. Remove `zone.js` from `package.json` dependencies
-5. Extensive testing of all async operations
-6. Test form interactions, HTTP calls, router events
-7. Performance benchmarking
+- [ ] **6.1** Update main.ts for zoneless
+  ```typescript
+  import { provideExperimentalZonelessChangeDetection } from '@angular/core';
 
-#### Risk Assessment
-- **HIGH RISK:** Zoneless is experimental in Angular 20
-- **RECOMMENDATION:** Plan for separate Phase 6.5 sprint after Phase 8 completion
+  bootstrapApplication(AppComponent, {
+    providers: [
+      provideExperimentalZonelessChangeDetection(),
+      provideRouter(routes),
+      provideHttpClient()
+    ]
+  }).catch(err => console.error(err));
+  ```
+
+- [ ] **6.2** Remove zone.js from polyfills
+  - Update `angular.json`:
+    ```json
+    "polyfills": []  // Remove "zone.js"
+    ```
+  - OR keep zone.js in package.json but don't import it
+
+- [ ] **6.3** Test all async operations
+  - Test form submissions
+  - Test HTTP calls and updates
+  - Test routing navigation
+  - Verify UI updates correctly without zone.js
+  - Check for any manual change detection needs
+
+- [ ] **6.4** Add manual change detection if needed
+  - If any components don't update, use `ChangeDetectorRef.markForCheck()`
+  - Or ensure all state changes go through Signals
+
+- [ ] **6.5** Performance testing
+  - Run Lighthouse audit
+  - Compare bundle sizes (should be smaller)
+  - Measure Time to Interactive
+  - Document performance improvements
+
+- [ ] **6.6** Extensive manual testing
+  - Test every user interaction
+  - Verify all UI updates occur
+  - Check browser console for errors
+  - Test in multiple browsers
+
+#### Deliverables (if completed)
+- ✅ Application runs in zoneless mode
+- ✅ zone.js removed from bundle (reduced size)
+- ✅ All change detection working correctly
+- ✅ Performance improvements documented
+
+#### Exit Criteria (if completing this phase)
+- [ ] Application runs without zone.js
+- [ ] Zero console errors about change detection
+- [ ] All user interactions trigger UI updates
+- [ ] Performance metrics improved
+- [ ] All tests passing in zoneless mode
+- [ ] Commit: "feat: enable zoneless mode with experimental change detection"
+
+#### Risk Level: **MEDIUM-HIGH**
+**Recommendation:** Defer this phase until Phases 1-5 are stable in production
 
 ---
 
-### Phase 7: Testing & Quality Assurance
-**Duration:** 3-4 hours  
-**Owner:** QA Engineer + Developer  
-**Prerequisite:** Phase 5 complete (or Phase 6 if pursued)  
-**Timeline:** Week 2-3, Day 5-6 (Feb 21-22 or Feb 25-26, 2026)
+### **PHASE 7: Testing & Quality Assurance**
+**Duration:** 4-6 hours  
+**Owner:** QA Engineer + Developers  
+**Parallel Work:** None (depends on Phases 1-5 complete)
 
 #### Objectives
-- Achieve >80% test coverage
-- Validate all functionality end-to-end
-- Performance testing and optimization
-- Cross-browser compatibility
+- Update all unit tests for new architecture
+- Achieve >80% code coverage
+- Perform comprehensive manual testing
+- Validate performance and bundle size improvements
 
-#### Tasks
-| Task | Description | Duration | Owner | Completion Criteria |
-|------|-------------|----------|-------|---------------------|
-| 7.1 | Run full unit test suite | 15 min | Developer | All tests executed |
-| 7.2 | Fix failing tests | 60 min | Developer | 100% unit tests passing |
-| 7.3 | Verify test coverage report | 15 min | Developer | Coverage >80% |
-| 7.4 | Manual E2E testing checklist | 60 min | QA Engineer | All scenarios passed |
-| 7.5 | Cross-browser testing | 30 min | QA Engineer | Chrome, Firefox, Edge, Safari |
-| 7.6 | Performance benchmarking | 30 min | Developer | Metrics documented |
-| 7.7 | Bundle size analysis | 20 min | Developer | Size reduction verified |
-| 7.8 | Accessibility audit (Lighthouse) | 20 min | Developer | Score >90 |
-| 7.9 | Security audit (`npm audit`) | 10 min | Developer | No critical vulnerabilities |
+#### Tasks Checklist
 
-#### Manual E2E Testing Checklist
+##### Unit Testing
 
-**User Story 1: Create Tutorial**
-- [ ] Navigate to /add
-- [ ] Fill in title and description
-- [ ] Submit form
-- [ ] Verify success message displays
-- [ ] Verify "New Tutorial" button resets form
+- [ ] **7.1** Update all component tests
+  - AppComponent: ✅
+  - AddTutorialComponent: Signal testing, standalone imports
+  - TutorialsListComponent: Signal testing, @for rendering
+  - TutorialDetailsComponent: input() testing, Signal assertions
 
-**User Story 2: View Tutorial List**
-- [ ] Navigate to /tutorials
-- [ ] Verify tutorials display in list
-- [ ] Click on a tutorial
-- [ ] Verify details view shows correct data
+- [ ] **7.2** Update service tests
+  - TutorialService: inject() compatibility, type checking
 
-**User Story 3: Search Tutorials**
-- [ ] Navigate to /tutorials
-- [ ] Enter search term in "Search by title" field
-- [ ] Click "Search" button
-- [ ] Verify filtered results appear
-- [ ] Clear search, verify all tutorials return
+- [ ] **7.3** Run full test suite
+  ```bash
+  npm test
+  ```
+  - Target: 100% pass rate
+  - Fix any failing tests
 
-**User Story 4: Edit Tutorial**
-- [ ] Navigate to specific tutorial (/tutorials/:id)
-- [ ] Click "Edit" button
-- [ ] Modify title and description
-- [ ] Click "Update" button
-- [ ] Verify success message
-- [ ] Verify changes persist
+- [ ] **7.4** Generate coverage report
+  ```bash
+  ng test --code-coverage
+  ```
+  - Review coverage/index.html
+  - Target: >80% coverage
+  - Identify and cover untested code paths
 
-**User Story 5: Publish/Unpublish Tutorial**
-- [ ] View a tutorial in edit mode
-- [ ] Toggle "Published" checkbox
-- [ ] Update status
-- [ ] Verify status change reflected
+##### Manual Testing Checklist
 
-**User Story 6: Delete Single Tutorial**
-- [ ] View a tutorial
-- [ ] Click "Delete" button
-- [ ] Verify tutorial removed and redirected to list
-- [ ] Verify tutorial no longer in list
+- [ ] **7.5** Test CRUD operations
+  - [ ] Create new tutorial (form validation, submission, success message)
+  - [ ] View tutorial list (empty state, populated state)
+  - [ ] Search tutorials by title (partial match, no match, exact match)
+  - [ ] View tutorial details (from list click)
+  - [ ] Edit tutorial (inline editing, save changes)
+  - [ ] Update published status (toggle button)
+  - [ ] Delete single tutorial (confirmation, list update)
+  - [ ] Delete all tutorials (confirmation, empty state)
 
-**User Story 7: Delete All Tutorials**
-- [ ] Navigate to /tutorials
-- [ ] Click "Remove All" button
-- [ ] Verify all tutorials deleted
-- [ ] Verify empty state message
+- [ ] **7.6** Test routing
+  - [ ] Navigate to /tutorials (default route)
+  - [ ] Navigate to /add (add tutorial page)
+  - [ ] Navigate to /tutorials/:id (details page with valid ID)
+  - [ ] Navigate to /tutorials/invalid-id (error handling)
+  - [ ] Browser back/forward buttons work correctly
 
-#### Performance Metrics
+- [ ] **7.7** Test form validation
+  - [ ] Empty form submission (if validation exists)
+  - [ ] Required fields
+  - [ ] Form reset after successful submission
 
-| Metric | Angular 16 Baseline | Angular 20 Target | Actual | Status |
-|--------|-------------------|------------------|--------|--------|
-| Bundle Size (main.js) | ~500 KB | ~450 KB (-10%) | TBD | ⏳ |
-| Initial Load Time | TBD | -15% improvement | TBD | ⏳ |
-| Time to Interactive | TBD | -15% improvement | TBD | ⏳ |
-| Lighthouse Performance | TBD | >90 | TBD | ⏳ |
-| Change Detection (ms) | TBD | -20% with OnPush | TBD | ⏳ |
+- [ ] **7.8** Test HTTP error handling
+  - [ ] Network offline scenario (if applicable)
+  - [ ] API error responses
+  - [ ] Loading states
+
+##### Cross-Browser Testing
+
+- [ ] **7.9** Test on Chrome (latest)
+- [ ] **7.10** Test on Firefox (latest)
+- [ ] **7.11** Test on Safari (latest, macOS)
+- [ ] **7.12** Test on Edge (latest)
+
+##### Performance Testing
+
+- [ ] **7.13** Run production build
+  ```bash
+  ng build --configuration production
+  ```
+  - Document bundle sizes
+  - Compare with Phase 1 baseline
+  - Should see 10-15% reduction (especially if zoneless)
+
+- [ ] **7.14** Run Lighthouse audit
+  - Performance score (target: 90+)
+  - Accessibility score (target: 95+)
+  - Best Practices score (target: 95+)
+  - Compare with Phase 1 baseline
+
+- [ ] **7.15** Measure key metrics
+  - First Contentful Paint (FCP)
+  - Time to Interactive (TTI)
+  - Total Blocking Time (TBT)
+  - Document all metrics
+
+##### Accessibility Testing
+
+- [ ] **7.16** Run AXE DevTools audit
+- [ ] **7.17** Test keyboard navigation
+  - Tab through all interactive elements
+  - Enter/Space activates buttons
+  - Escape closes dialogs (if any)
+
+- [ ] **7.18** Test screen reader (NVDA or JAWS)
+  - Basic navigation
+  - Form labels announced correctly
 
 #### Deliverables
-- ✅ Test coverage report (>80%)
-- ✅ All unit tests passing (21/21)
-- ✅ Manual E2E checklist 100% complete
-- ✅ Performance comparison report
-- ✅ Cross-browser validation report
+- ✅ All unit tests passing (100%)
+- ✅ Code coverage >80%
+- ✅ Manual testing checklist 100% complete
+- ✅ Cross-browser testing complete
+- ✅ Performance report with metrics
 - ✅ Accessibility audit report
 
 #### Exit Criteria
-- Zero failing tests
-- All E2E scenarios pass
-- Performance meets or exceeds targets
-- No critical bugs identified
-- All browsers supported
+- [ ] Zero failing unit tests
+- [ ] All manual test scenarios pass
+- [ ] No critical bugs found
+- [ ] Performance meets or exceeds baseline
+- [ ] Accessibility issues (if any) documented
+- [ ] Commit: "test: update all tests for Angular 20 architecture"
+
+#### Risk Level: **LOW**
+Testing reduces risk for deployment
 
 ---
 
-### Phase 8: Documentation & Deployment
-**Duration:** 1-2 hours  
-**Owner:** Technical Lead + Team  
-**Prerequisite:** Phase 7 complete  
-**Timeline:** Week 3, Day 7 (Feb 28, 2026)
+### **PHASE 8: Documentation & Deployment**
+**Duration:** 2-3 hours  
+**Owner:** Lead Developer + Tech Writer  
+**Parallel Work:** None (final phase)
 
 #### Objectives
-- Update all documentation
-- Prepare for production deployment
-- Create post-migration resources
-- Establish monitoring
+- Update project documentation
+- Document migration decisions and patterns
+- Prepare for deployment
+- Create rollback procedures
 
-#### Tasks
-| Task | Description | Duration | Owner | Completion Criteria |
-|------|-------------|----------|-------|---------------------|
-| 8.1 | Update README.md with Angular 20 info | 20 min | Lead Dev | README reflects new version |
-| 8.2 | Create migration narrative document | 30 min | Lead Dev | Narrative complete |
-| 8.3 | Update developer onboarding guide | 20 min | Lead Dev | Guide updated |
-| 8.4 | Create Angular 20 coding standards doc | 30 min | Lead Dev | Standards documented |
-| 8.5 | Deploy to staging environment | 20 min | DevOps/Lead | Staging deployment successful |
-| 8.6 | Smoke test staging | 15 min | QA | Staging validated |
-| 8.7 | Prepare production deployment plan | 20 min | Lead Dev | Plan approved |
-| 8.8 | Create rollback procedure document | 15 min | Lead Dev | Rollback plan ready |
-| 8.9 | Schedule team retrospective | 10 min | Lead Dev | Meeting scheduled |
+#### Tasks Checklist
 
-#### Documentation Updates
+##### Documentation Updates
 
-**README.md Updates:**
-- Update Angular version badge
-- Update installation instructions
-- Add note about standalone architecture
-- Update development commands if changed
+- [ ] **8.1** Update README.md
+  - Update Angular version to 20.x
+  - Add new development commands (if changed)
+  - Document new architecture patterns
+  - Update dependency installation instructions
 
-**New Documentation to Create:**
-1. **Migration Narrative** - Story of migration, decisions made, lessons learned
-2. **Coding Standards v2.0** - Signal patterns, inject() usage, modern control flow
-3. **Rollback Procedure** - Step-by-step rollback instructions
+- [ ] **8.2** Create Migration Narrative document
+  - This should be generated by the Migration Documentation Agent
+  - Document: what changed, why, how to maintain
+  - Include code examples of new patterns
+  - Save as: `Reports/migration-narrative.md`
 
-#### Deployment Checklist
+- [ ] **8.3** Update developer onboarding docs
+  - Explain Signals-based state management
+  - Explain modern control flow syntax
+  - Explain inject() pattern
+  - Provide code examples
 
-**Pre-Deployment:**
-- [ ] All tests passing
-- [ ] Code reviewed and approved
-- [ ] Staging environment tested
-- [ ] Performance validated
-- [ ] Rollback plan documented
-- [ ] Stakeholders notified
-- [ ] Backup created
+- [ ] **8.4** Document architectural decisions
+  - Why Signals over traditional state
+  - Why inject() over constructor DI
+  - Whether zoneless was implemented
+  - Forms approach (template-driven vs reactive)
 
-**Deployment Steps:**
-1. Merge feature branch to `main`
-2. Create git tag `v20-migration-complete`
-3. Build production bundle
-4. Deploy to staging
-5. Validate staging
-6. Deploy to production
-7. Monitor for 24 hours
+- [ ] **8.5** Create migration lessons learned
+  - What went well
+  - What challenges were encountered
+  - Recommendations for future migrations
 
-**Post-Deployment:**
-- [ ] Monitor error logs (first 24 hours)
-- [ ] Track performance metrics
-- [ ] Gather user feedback
-- [ ] Document any issues
-- [ ] Schedule retrospective
+##### Deployment Preparation
+
+- [ ] **8.6** Review and finalize all commits
+  - Clean commit history (consider squashing if needed)
+  - Ensure meaningful commit messages
+  - All code commented appropriately
+
+- [ ] **8.7** Create pull request
+  - PR from `feature/angular-20-migration` to `master`
+  - Include migration summary in PR description
+  - Tag reviewers
+  - Link to this migration plan
+
+- [ ] **8.8** Code review
+  - Address all code review comments
+  - Get approvals from required reviewers
+
+- [ ] **8.9** Final smoke test on PR build
+  - Deploy PR to staging environment
+  - Run full manual test suite
+  - Verify performance metrics
+
+- [ ] **8.10** Create deployment checklist
+  - Pre-deployment: backup current production
+  - Deployment: steps to deploy (CI/CD pipeline)
+  - Post-deployment: smoke tests to run
+  - Monitoring: what to watch for
+
+- [ ] **8.11** Create rollback plan
+  - How to quickly revert to Angular 16
+  - Database compatibility (should be no changes)
+  - Estimated rollback time
+
+- [ ] **8.12** Prepare team communication
+  - Email to stakeholders about upgrade
+  - What changed from user perspective (nothing should change)
+  - When deployment is scheduled
+
+##### Deployment Execution
+
+- [ ] **8.13** Merge pull request
+  - Ensure all checks pass (tests, linting, build)
+  - Squash and merge or regular merge (team decision)
+
+- [ ] **8.14** Deploy to staging
+  - Follow deployment checklist
+  - Run smoke tests
+  - Monitor for 24 hours
+
+- [ ] **8.15** Deploy to production
+  - Schedule deployment window
+  - Follow deployment checklist
+  - Run post-deployment smoke tests
+  - Monitor application health
+
+- [ ] **8.16** Post-deployment monitoring
+  - Watch error logs for 48 hours
+  - Monitor performance metrics
+  - Check user feedback/reports
+  - Be ready to rollback if needed
+
+##### Team Training
+
+- [ ] **8.17** Conduct team training session
+  - 2-hour workshop on Angular 20 patterns
+  - Live coding examples
+  - Q&A session
+  - Record session for future reference
+
+- [ ] **8.18** Create quick reference guides
+  - Signals cheat sheet
+  - Modern control flow syntax
+  - inject() usage patterns
 
 #### Deliverables
-- ✅ All documentation updated
-- ✅ Staging deployment successful
-- ✅ Production deployment plan approved
-- ✅ Rollback procedure documented
-- ✅ Team retrospective scheduled
+- ✅ README.md updated
+- ✅ Migration narrative document
+- ✅ Developer onboarding updated
+- ✅ Pull request created and approved
+- ✅ Deployment checklist
+- ✅ Rollback plan
+- ✅ Team training completed
+- ✅ Application deployed to production
 
 #### Exit Criteria
-- Staging environment running Angular 20 version
-- All documentation reviewed and published
-- Production deployment approved by stakeholders
-- Team trained on new patterns
+- [ ] All documentation updated and reviewed
+- [ ] Pull request merged
+- [ ] Application running in production
+- [ ] Team trained on new patterns
+- [ ] Zero critical issues in production
+- [ ] Project marked as COMPLETE ✅
 
 ---
 
-## 5. Task Dependencies & Critical Path
+## 📊 Resource Allocation & Timeline
 
-### Dependency Graph
+### Team Structure
 
-```
-Phase 1 (Pre-Migration)
-    ↓
-Phase 2 (Angular Update)
-    ↓
-Phase 3.1 (AppComponent) ← CRITICAL PATH
-    ↓
-Phase 3.2, 3.3, 3.4 (Feature Components) ← CAN PARALLELIZE
-    ↓
-Phase 4 (Module Elimination) ← CRITICAL PATH
-    ↓
-Phase 5 (Service Modernization)
-    ↓
-Phase 6 (Zoneless - OPTIONAL)
-    ↓
-Phase 7 (Testing & QA) ← CRITICAL PATH
-    ↓
-Phase 8 (Documentation & Deployment) ← CRITICAL PATH
-```
+#### Recommended Team Composition
 
-### Critical Path Items
-1. ✅ Phase 1: Pre-Migration Preparation (MUST complete first)
-2. ✅ Phase 2: Angular Core Update (BLOCKING)
-3. ✅ Phase 3.1: AppComponent Migration (BLOCKING for 3.2-3.4)
-4. ✅ Phase 4: Module Elimination (BLOCKING for deployment)
-5. ✅ Phase 7: Testing & QA (BLOCKING for deployment)
-6. ✅ Phase 8: Documentation & Deployment (FINAL)
+| Role | Responsibility | Time Commitment |
+|------|---------------|-----------------|
+| **Lead Developer** | Phases 1, 2, 4, 6 (critical path) | Full-time, 2 weeks |
+| **Developer 2** | Phase 3.2 (AddTutorialComponent) | 3 hours |
+| **Developer 3** | Phase 3.3 (TutorialsListComponent) | 5 hours |
+| **Developer 4** | Phase 3.4 (TutorialDetailsComponent) | 5 hours |
+| **Any Developer** | Phase 5 (Service modernization) | 2 hours |
+| **QA Engineer** | Phase 7 (Testing) | 6 hours |
+| **Tech Writer** | Phase 8 (Documentation) | 3 hours |
+| **Senior Reviewer** | Code review and architecture approval | 4 hours |
 
-**Total Critical Path Duration:** 12-17 hours (minimum timeline if sequential)
+#### Minimum Team (if solo developer)
+- **1 Full-Stack Developer:** All phases sequentially, 3 weeks part-time or 1 week full-time
+
+### Timeline Options
+
+#### **Option A: Aggressive (1 Week - Full-Time Dedicated)**
+
+| Day | Phases | Hours | Activities |
+|-----|--------|-------|------------|
+| **Monday** | Phase 1, 2 | 6-7 hrs | Preparation, Angular upgrade |
+| **Tuesday** | Phase 3.1, 3.2, 3.3 | 7-8 hrs | AppComponent, 2 feature components |
+| **Wednesday** | Phase 3.4, 4 | 6-7 hrs | TutorialDetails, Module elimination |
+| **Thursday** | Phase 5, 6 | 4-5 hrs | Service modernization, Zoneless (optional) |
+| **Friday** | Phase 7 | 6 hrs | Testing & QA |
+| **Weekend** | Phase 8 | 3 hrs | Documentation, deploy to staging |
+| **Monday+** | Monitoring | - | Production deployment, monitoring |
+
+**Total:** ~40 hours over 1 week + deployment
+
+---
+
+#### **Option B: Balanced (2 Weeks - 50% Time Allocation)** ⭐ RECOMMENDED
+
+| Week | Days | Phases | Hours/Day | Activities |
+|------|------|--------|-----------|------------|
+| **Week 1** | Mon | Phase 1 | 3 hrs | Preparation, baseline |
+| | Tue | Phase 2 | 4 hrs | Angular upgrade |
+| | Wed | Phase 3.1, 3.2 | 4 hrs | AppComponent + AddTutorial |
+| | Thu | Phase 3.3 | 4 hrs | TutorialsListComponent |
+| | Fri | Phase 3.4 | 4 hrs | TutorialDetailsComponent |
+| **Week 2** | Mon | Phase 4, 5 | 3 hrs | Module elimination, Service |
+| | Tue | Phase 6 (optional) | 3 hrs | Zoneless preparation |
+| | Wed-Thu | Phase 7 | 6 hrs | Testing & QA |
+| | Fri | Phase 8 | 3 hrs | Documentation, PR, deploy |
+
+**Total:** ~38 hours over 2 weeks
+
+---
+
+#### **Option C: Conservative (3 Weeks - Part-Time)** 
+
+| Week | Focus | Hours | Notes |
+|------|-------|-------|-------|
+| **Week 1** | Phases 1-2 | 8 hrs | Preparation + Angular upgrade, thorough testing |
+| **Week 2** | Phases 3-5 | 12 hrs | All component migrations, testing each |
+| **Week 3** | Phases 6-8 | 10 hrs | Optional zoneless, extensive QA, deployment |
+
+**Total:** ~30 hours over 3 weeks (10 hrs/week)
+
+---
 
 ### Parallel Work Opportunities
 
-**Can Run in Parallel (after Phase 3.1):**
-- Phase 3.2: AddTutorialComponent
-- Phase 3.3: TutorialsListComponent  
-- Phase 3.4: TutorialDetailsComponent
+#### **Maximum Parallelization (4 developers):**
 
-**Savings with 2 Developers:** 3-4 hours (if components parallelized)
+**Week 1:**
+- Developer 1: Phases 1, 2 (critical path)
 
----
+**After Phase 2 complete:**
+- Developer 1: Phase 3.1 (AppComponent) → Phase 4 (Module elimination)
+- Developer 2: Phase 3.2 (AddTutorialComponent)
+- Developer 3: Phase 3.3 (TutorialsListComponent)
+- Developer 4: Phase 3.4 (TutorialDetailsComponent)
 
-## 6. Resource Allocation
+**After Phase 3 & 4 complete:**
+- Developer 1 or 2: Phase 5 (Service)
+- Developer 1: Phase 6 (Zoneless, if doing it)
 
-### 6.1 Team Roles & Responsibilities
+**Week 2:**
+- All developers: Phase 7 (Testing - divided by component)
+- Developer 1 + Tech Writer: Phase 8 (Documentation)
 
-| Role | Responsibilities | Time Commitment | Assigned To |
-|------|-----------------|----------------|-------------|
-| **Technical Lead** | Architecture decisions, Phase 2, 4, 8 | 12-16 hours | [TBD] |
-| **Developer** | Component migration (Phase 3, 5) | 10-14 hours | [TBD] |
-| **QA Engineer** | Testing (Phase 7), validation | 4-6 hours | [TBD] |
-| **Code Reviewer** | Review all PRs, approve architecture | 3-4 hours | [TBD] |
-| **Project Manager** | Track progress, remove blockers | 2-3 hours oversight | [TBD] |
-
-### 6.2 Recommended Team Configurations
-
-#### Option A: Solo Developer (Conservative)
-- **Team:** 1 Full-Stack Developer
-- **Timeline:** 3 weeks, part-time (8-10 hrs/week)
-- **Phases:** All sequential
-- **Total Hours:** 28-32 hours
-- **Risk:** LOW (more time for careful work)
-- **Cost:** 1 developer × 3 weeks
-
-#### Option B: Solo Developer (Accelerated)
-- **Team:** 1 Senior Developer
-- **Timeline:** 1.5-2 weeks, full-time
-- **Phases:** Mostly sequential, some component parallelization
-- **Total Hours:** 26-30 hours
-- **Risk:** MEDIUM (compressed timeline)
-- **Cost:** 1 developer × 2 weeks
-
-#### Option C: Small Team (Recommended)
-- **Team:** 1 Lead + 1 Developer + 1 QA
-- **Timeline:** 1 week, focused work
-- **Phases:** Lead owns critical path, Dev handles components in parallel, QA does continuous testing
-- **Total Hours:** Lead (16h) + Dev (12h) + QA (6h) = 34 hours collective
-- **Risk:** LOW (distributed workload, continuous validation)
-- **Cost:** 3 people × 1 week (but faster delivery)
-
-**RECOMMENDED:** Option C - Small Team approach for quality and speed
-
-### 6.3 Skill Requirements
-
-| Skill | Required Level | Purpose | Training Needed |
-|-------|---------------|---------|-----------------|
-| Angular (v16) | Intermediate | Understand current codebase | None |
-| Angular (v20) | Beginner | Implement new patterns | 2-hour workshop |
-| TypeScript | Intermediate | Type safety, generics | None |
-| RxJS | Intermediate | Observables, operators | None |
-| Signals (Angular) | Beginner | New state management | 2-hour workshop |
-| Testing (Jasmine) | Intermediate | Update unit tests | None |
-| Git | Intermediate | Branch management | None |
-
-### 6.4 Training Plan
-
-**Pre-Migration Training (Required):**
-- **Session 1: Angular Signals Deep Dive** (2 hours)
-  - What are Signals?
-  - `signal()`, `computed()`, `effect()`
-  - Converting from properties to Signals
-  - Two-way binding with Signals
-  - Best practices
-
-- **Session 2: Modern Angular Patterns** (2 hours)
-  - Standalone components
-  - `inject()` function vs constructor DI
-  - Modern control flow (`@if`, `@for`, `@switch`)
-  - `input()` and `output()` functions
-  - OnPush change detection
-  - Zoneless concepts
-
-**Training Materials:**
-- Official Angular docs: https://angular.dev
-- Video tutorials (curated list)
-- Code examples from migration
-- Internal coding standards document
-
-**Training Timeline:** Week before migration starts (Feb 10-14, 2026)
+**Estimated time with 4 developers:** 1.5 weeks
 
 ---
 
-## 7. Risk Management
+## ⚠️ Risk Management
 
-### 7.1 Risk Register
+### Risk Register
 
-| ID | Risk | Probability | Impact | Severity | Mitigation Strategy | Owner |
-|----|------|------------|--------|----------|---------------------|-------|
-| R1 | Third-party library incompatibility with Angular 20 | MEDIUM | HIGH | HIGH | Pre-check all dependencies, have alternatives ready | Lead Dev |
-| R2 | Unexpected breaking changes in Angular 17-20 | MEDIUM | HIGH | HIGH | Review changelogs thoroughly, allocate buffer time | Lead Dev |
-| R3 | Signal two-way binding complexity in forms | HIGH | MEDIUM | MEDIUM | Use `model()` or consider Reactive Forms pattern | Developer |
-| R4 | Team unfamiliar with Signal patterns | HIGH | MEDIUM | MEDIUM | Mandatory pre-migration training | PM |
-| R5 | Route param integration with input signals | MEDIUM | MEDIUM | MEDIUM | Use `withComponentInputBinding()` or traditional route | Lead Dev |
-| R6 | Test suite breaks extensively | LOW | HIGH | MEDIUM | Fix iteratively, accept temporary test failures | Developer |
-| R7 | Performance degrades instead of improves | LOW | HIGH | MEDIUM | Performance testing in Phase 7, rollback if needed | Lead Dev |
-| R8 | Zoneless change detection issues | HIGH | HIGH | HIGH | Make Phase 6 optional, defer to future iteration | Lead Dev |
-| R9 | Timeline slips due to unexpected complexity | MEDIUM | MEDIUM | MEDIUM | 25% buffer time allocated | PM |
-| R10 | Critical bug discovered late in migration | LOW | HIGH | MEDIUM | Comprehensive testing in Phase 7 before deployment | QA |
+| Risk ID | Risk Description | Probability | Impact | Mitigation Strategy | Owner |
+|---------|------------------|-------------|--------|---------------------|-------|
+| **R1** | Breaking changes in Angular 17-20 not documented | Medium | High | Thorough changelog review, incremental testing | Lead Dev |
+| **R2** | Third-party library incompatibility | Low | Medium | Review library Angular 20 support before migration | Lead Dev |
+| **R3** | Form binding behavior changes with Signals | Medium | Medium | Extensive testing of all forms; consider Reactive Forms | Dev Team |
+| **R4** | Change detection not triggering in zoneless | Medium | High | Keep zone.js initially; defer Phase 6 if issues | Lead Dev |
+| **R5** | Test suite fails after migration | High | Medium | Update tests incrementally with each phase | Dev Team |
+| **R6** | Performance regression | Low | Medium | Baseline metrics, continuous monitoring | QA Engineer |
+| **R7** | Team unfamiliar with Signals | High | Low | Provide training before migration starts | Lead Dev |
+| **R8** | Time estimate exceeded | Medium | Low | Follow conservative timeline; prioritize core phases | PM |
+| **R9** | Production bugs after deployment | Low | High | Thorough QA, staged rollout, rollback plan ready | Lead Dev |
 
-### 7.2 Mitigation Strategies Detail
+### Mitigation Strategies
 
-#### R1: Third-Party Library Incompatibility
-**Prevention:**
-- Pre-check Bootstrap 4.6.2 compatibility with Angular 20
-- Review RxJS 7.8.0 compatibility
-- Have upgrade paths identified
+#### For High-Impact Risks
 
-**Response:**
-- If Bootstrap incompatible: Upgrade to Bootstrap 5.x or use Angular Material
-- If RxJS incompatible: Update to compatible version
-- If critical library has no solution: Defer migration
+**R1: Breaking Changes**
+- Read full changelogs for Angular 17, 18, 19, 20 before starting
+- Run `ng update` with `--dry-run` first to preview changes
+- Test after each major change
+- Keep Angular update guide open: https://update.angular.io/
 
-#### R3: Signal Two-Way Binding Complexity
-**Prevention:**
-- Study `model()` function docs before Phase 3
-- Have Reactive Forms migration as backup plan
+**R4: Zoneless Change Detection**
+- Make Phase 6 (zoneless) OPTIONAL
+- Complete Phases 1-5 first and deploy
+- Revisit zoneless in future iteration
+- If attempting, keep zone.js as fallback
 
-**Response:**
-- If `[(ngModel)]` with Signals too complex, migrate forms to Reactive Forms
-- Use manual event handlers as intermediate solution
+**R9: Production Bugs**
+- Deploy to staging environment first
+- 24-hour soak test in staging
+- Gradual rollout (if infrastructure supports)
+- Rollback plan tested and ready
+- Monitor error logs closely post-deployment
 
-#### R4: Team Unfamiliarity
-**Prevention:**
-- Mandatory training 1 week before migration
-- Provide reference documentation and examples
+#### For Likely Risks
 
-**Response:**
-- Pair programming during complex component migrations
-- Daily standup to address knowledge gaps
-- Extended code review sessions
+**R5: Test Suite Failures**
+- Update tests alongside component changes
+- Never commit without tests passing
+- Use `--watch` mode during development
+- Pair programming for complex test updates
 
-#### R8: Zoneless Issues (If Pursued)
-**Prevention:**
-- Make Phase 6 optional
-- Defer to future sprint after core migration stable
+**R7: Team Unfamiliarity**
+- 2-hour Signals training session BEFORE migration starts
+- Create internal cheat sheets
+- Pair less experienced devs with lead
+- Code review focuses on teaching
 
-**Response:**
-- If zoneless causes issues, revert to zone.js
-- Document issues for future attempt
-- Focus on completing Phases 1-5 successfully first
-
-### 7.3 Rollback Procedures
+### Rollback Procedures
 
 #### Immediate Rollback (During Development)
-**Trigger:** Cannot resolve blocking issue within 4 hours
 
-**Steps:**
-1. `git checkout main`
-2. `git branch -D feature/angular-20-migration`
-3. `npm install` (restore Angular 16)
-4. Communicate to stakeholders
-5. Conduct post-mortem
+**Scenario:** Major blocker discovered during migration
 
-**Rollback Time:** 15 minutes
+**Procedure:**
+1. Stop all work on feature branch
+2. Document the blocker issue
+3. Create a new branch if needed
+4. Revert specific commits:
+   ```bash
+   git revert <commit-hash>
+   ```
+5. Or reset to last known good state:
+   ```bash
+   git reset --hard <commit-hash>
+   ```
 
-#### Phase-Level Rollback
-**Trigger:** Phase exit criteria not met after reasonable effort
+**Estimated Time:** 15 minutes  
+**Data Loss:** None (git history preserved)
 
-**Steps:**
-1. Revert to previous phase completion commit
-2. Create tag for failed phase investigation
-3. Analyze what went wrong
-4. Revise approach for failed phase
-5. Retry phase with new strategy
+---
 
-**Rollback Time:** 30 minutes
+#### Post-Deployment Rollback (Production Issues)
 
-#### Post-Deployment Rollback
-**Trigger:** 
-- >2 critical bugs in production
+**Scenario:** Critical bugs in production after deployment
+
+**Trigger Conditions:**
+- 2+ critical bugs affecting core functionality
 - Performance degradation >20%
-- User-impacting functionality broken
+- Unrecoverable errors for any users
+- Data integrity issues
 
-**Steps:**
-1. Deploy previous Angular 16 build artifact
-2. Revert CDN/hosting to tagged v16 version
-3. Verify application functionality
-4. Communicate to users if necessary
-5. Conduct incident post-mortem
-6. Plan remediation
+**Procedure:**
+1. **Immediate (< 5 minutes):**
+   - Deploy previous Angular 16 build artifact from backup
+   - Update CDN/hosting to point to previous version
+   - Verify application loads
 
-**Rollback Time:** 1-2 hours
+2. **Short-term (< 30 minutes):**
+   - Roll back database migrations (if any - shouldn't be needed)
+   - Clear CDN caches
+   - Restart services if needed
+   - Run smoke tests on rolled-back version
 
-### 7.4 Quality Gates
+3. **Communication (< 15 minutes):**
+   - Notify stakeholders of rollback
+   - Update status page (if applicable)
+   - Document what went wrong
 
-Each phase has defined exit criteria that MUST be met before proceeding:
+4. **Post-Rollback (within 24 hours):**
+   - Analyze root cause
+   - Fix issues in feature branch
+   - Re-test thoroughly
+   - Plan re-deployment
 
-**Gate 1 (After Phase 1):**
-- ✅ All tests passing
-- ✅ Team alignment achieved
-- ⛔ CANNOT PROCEED if baseline is unstable
-
-**Gate 2 (After Phase 2):**
-- ✅ Application compiles on Angular 20
-- ✅ App loads in browser without errors
-- ⛔ CANNOT PROCEED if critical dependencies incompatible
-
-**Gate 3 (After Phase 3):**
-- ✅ All components standalone and functional
-- ✅ >90% test pass rate
-- ⛔ CANNOT PROCEED if any component non-functional
-
-**Gate 4 (After Phase 4):**
-- ✅ Zero module files
-- ✅ All routes working
-- ⛔ CANNOT PROCEED if routing broken
-
-**Gate 5 (After Phase 7):**
-- ✅ 100% E2E scenarios pass
-- ✅ Performance meets targets
-- ⛔ CANNOT DEPLOY if critical bugs found
+**Estimated Rollback Time:** 30-45 minutes  
+**Data Loss:** None expected (no schema changes)
 
 ---
 
-## 8. Success Metrics & KPIs
+##  Success Metrics & Validation
 
-### 8.1 Technical Success Metrics
+### Technical Success Metrics
 
-| Metric | Baseline (v16) | Target (v20) | Measurement Method | Priority |
-|--------|--------------|-------------|-------------------|----------|
-| **Compilation Errors** | 0 | 0 | `ng build` output | CRITICAL |
-| **Unit Test Pass Rate** | 100% (21/21) | 100% (21/21) | `ng test` | CRITICAL |
-| **Test Coverage** | TBD | >80% | Coverage report | HIGH |
-| **Bundle Size** | ~500 KB | <450 KB | Build analyzer | HIGH |
-| **Standalone Components** | 0% (0/4) | 100% (4/4) | Manual audit | CRITICAL |
-| **Module Files** | 2 | 0 | File count | CRITICAL |
-| **Signal Usage** | 0% | 100% | Code review | HIGH |
-| **Modern Control Flow** | 0% | 100% | Template audit | HIGH |
-| **Type Safety (any usage)** | Some | None | TSLint/ESLint | MEDIUM |
-| **Lighthouse Performance** | TBD | >90 | Lighthouse audit | MEDIUM |
-| **Console Errors** | 0 | 0 | Browser DevTools | CRITICAL |
+| Metric | Baseline (Angular 16) | Target (Angular 20) | Measurement Method |
+|--------|----------------------|---------------------|-------------------|
+| **Bundle Size (main.js)** | TBD in Phase 1 | -10 to -15% | `ng build --prod`, check dist/ |
+| **Bundle Size (total)** | TBD in Phase 1 | -10 to -15% | Sum of dist/ files |
+| **Test Pass Rate** | 100% | 100% | `npm test` |
+| **Test Coverage** | TBD in Phase 1 | >80% | `ng test --code-coverage` |
+| **TypeScript Errors** | 0 | 0 | `ng build` |
+| **Lighthouse Performance** | TBD in Phase 1 | ≥90 | Chrome DevTools Lighthouse |
+| **First Contentful Paint** | TBD in Phase 1 | ≤1.5s | Lighthouse |
+| **Time to Interactive** | TBD in Phase 1 | ≤3s | Lighthouse |
+| **Standalone Components** | 0% (0/4) | 100% (4/4) | Manual count |
+| **Signal Usage** | 0% | 100% | Code review |
+| **Legacy Control Flow** | 100% | 0% | Template review |
 
-### 8.2 Performance Metrics
+### Functional Success Metrics
 
-| Metric | Baseline | Target | Actual | Status |
-|--------|----------|--------|--------|--------|
-| Initial Load Time (ms) | TBD | -15% | TBD | ⏳ |
-| Time to Interactive (ms) | TBD | -15% | TBD | ⏳ |
-| Change Detection Cycle (ms) | TBD | -20% | TBD | ⏳ |
-| Bundle Size (KB) | ~500 | ~425 | TBD | ⏳ |
-| Memory Usage (MB) | TBD | -10% | TBD | ⏳ |
+| Feature | Success Criteria | Validation Method |
+|---------|-----------------|-------------------|
+| **Create Tutorial** | Form submits, success message shown, tutorial appears in list | Manual test |
+| **View Tutorial List** | All tutorials display, pagination works (if applicable) | Manual test |
+| **Search Tutorials** | Correct results returned, UI updates | Manual test |
+| **View Tutorial Details** | Correct tutorial shown, data accurate | Manual test |
+| **Edit Tutorial** | Changes saved, UI updates | Manual test |
+| **Update Published Status** | Status toggles, saved correctly | Manual test |
+| **Delete Tutorial** | Tutorial removed from list and database | Manual test |
+| **Delete All Tutorials** | All tutorials removed, empty state shown | Manual test |
+| **Routing** | All routes accessible, browser nav works | Manual test |
 
-### 8.3 Project Management Metrics
+### User Experience Metrics
 
-| Metric | Target | Measurement | Status |
-|--------|--------|-------------|--------|
-| **Timeline Adherence** | ±10% of estimate | Actual vs planned hours | ⏳ |
-| **Budget Adherence** | ±15% of estimate | Actual cost vs budget | ⏳ |
-| **Scope Creep** | <5% | Change requests vs original scope | ⏳ |
-| **Defect Density** | <2 per component | Bugs found per component | ⏳ |
-| **Rework Rate** | <10% | Hours spent on rework | ⏳ |
+| Metric | Target | Measurement |
+|--------|--------|-------------|
+| **Page Load Time** | No regression | Browser DevTools |
+| **Form Responsiveness** | Instant feedback on input | Manual observation |
+| **UI Update Speed** | No perceived lag | Manual observation |
+| **Error Messages** | Clear and helpful | Manual review |
+| **Accessibility Score** | ≥95 | Lighthouse |
 
-### 8.4 Quality Metrics
+### Code Quality Metrics
 
-| Metric | Target | How Measured |
-|--------|--------|--------------|
-| **Code Review Coverage** | 100% | All PRs reviewed |
-| **Documentation Completeness** | 100% | Checklist completion |
-| **Test Scenarios Passed** | 100% (7/7) | Manual E2E testing |
-| **Cross-Browser Compatibility** | 100% (4/4 browsers) | Testing matrix |
-| **Accessibility Score** | >90 | Lighthouse audit |
-
-### 8.5 Post-Deployment Monitoring
-
-**First 24 Hours:**
-- Monitor error logs every 2 hours
-- Track performance metrics
-- User feedback collection
-
-**First Week:**
-- Daily performance dashboard review
-- Bug tracking and triage
-- User satisfaction survey
-
-**First Month:**
-- Weekly performance reports
-- Long-term stability monitoring
-- Team productivity assessment
+| Metric | Target | Measurement Method |
+|--------|--------|-------------------|
+| **TypeScript `any` usage** | 0 in new code | Code review, linting |
+| **Console errors/warnings** | 0 | Browser DevTools |
+| **Linting errors** | 0 | `ng lint` (if configured) |
+| **Code duplication** | Minimal | SonarQube or manual review |
+| **Component complexity** | Low to Medium | Cyclomatic complexity tools |
 
 ---
 
-## 9. Timeline & Milestones
+## 📝 Validation Checkpoints
 
-### 9.1 Gantt Chart Overview
+### Phase Exit Validation
 
-```
-Week 1 (Feb 17-21, 2026)
-├── Day 1: Phase 1 (Pre-Migration) ████ DONE
-├── Day 1-2: Phase 2 (Angular Update) ████████ DONE
-├── Day 2-3: Phase 3.1 (AppComponent) ███ DONE
-├── Day 3-4: Phase 3.2-3.4 (Components) █████████████
-└── Day 5: Phase 4 (Module Elimination) ████
+Each phase has specific exit criteria (see phase details above). Here's the consolidated validation checklist:
 
-Week 2 (Feb 24-28, 2026)
-├── Day 1: Phase 5 (Service) ████
-├── Day 1-2: Phase 6 (Zoneless - OPTIONAL) ████████
-├── Day 2-3: Phase 7 (Testing) ████████
-└── Day 4-5: Phase 8 (Documentation) ████
+#### ✅ Phase 1 Validation
+- [ ] Git tag created: `v1.0-angular-16-baseline`
+- [ ] Feature branch exists and pushed
+- [ ] All tests passing (100%)
+- [ ] Baseline metrics documented
 
-Week 3 (Mar 3-7, 2026)
-└── Day 1-2: Buffer for issues, final deployment █████
-```
+#### ✅ Phase 2 Validation
+- [ ] `ng serve` runs without errors
+- [ ] Application loads in browser
+- [ ] All `@angular/*` packages at v20.x.x
 
-### 9.2 Milestone Schedule
+#### ✅ Phase 3 Validation
+- [ ] All 4 components have `standalone: true`
+- [ ] All components use Signals for state
+- [ ] Zero `*ngIf` / `*ngFor` in templates
+- [ ] All component tests passing
 
-| Milestone | Target Date | Deliverable | Stakeholder Review |
-|-----------|------------|-------------|-------------------|
-| **M1: Migration Start** | Feb 17, 2026 | Phase 1 complete, branch created | Kickoff meeting |
-| **M2: Angular 20 Upgrade** | Feb 18, 2026 | App running on Angular 20 | Tech Lead approval |
-| **M3: Standalone Migration** | Feb 21, 2026 | All components standalone | Code review |
-| **M4: Modules Eliminated** | Feb 21, 2026 | Zero module files | Architecture review |
-| **M5: Testing Complete** | Feb 25, 2026 | All tests passing, QA signoff | QA approval |
-| **M6: Staging Deployment** | Feb 26, 2026 | Deployed to staging | Stakeholder demo |
-| **M7: Production Deployment** | Feb 28, 2026 | Live on production | Final approval |
-| **M8: Post-Deployment Review** | Mar 7, 2026 | Retrospective complete | Team meeting |
+#### ✅ Phase 4 Validation
+- [ ] Zero `*.module.ts` files in src/app
+- [ ] `main.ts` uses `bootstrapApplication()`
+- [ ] All routes working
 
-### 9.3 Daily Standup Schedule
+#### ✅ Phase 5 Validation
+- [ ] TutorialService uses `inject()`
+- [ ] No `any` types in service
+- [ ] Service tests passing
 
-**During Migration (Weeks 1-2):**
-- **Time:** 9:00 AM daily
-- **Duration:** 15 minutes
-- **Attendees:** Technical Lead, Developers, QA
-- **Format:**
-  - What was completed yesterday?
-  - What's planned for today?
-  - Any blockers?
-  - Review exit criteria for current phase
+#### ✅ Phase 6 Validation (if completed)
+- [ ] Application runs without zone.js
+- [ ] All change detection working
+- [ ] Performance improved
 
-### 9.4 Buffer Time Allocation
+#### ✅ Phase 7 Validation
+- [ ] All tests passing (100%)
+- [ ] Manual testing complete
+- [ ] Performance metrics meet targets
 
-**Total Estimated Effort:** 21-31 hours  
-**Buffer (25%):** 5-8 hours  
-**Total Planned:** 26-39 hours
-
-**Buffer Usage Guidelines:**
-- Unexpected breaking changes: 2-3 hours
-- Complex Signal refactoring: 2-3 hours
-- Extended testing if issues found: 1-2 hours
-- Documentation polish: 1 hour
+#### ✅ Phase 8 Validation
+- [ ] Documentation updated
+- [ ] PR merged
+- [ ] Application in production
+- [ ] Zero critical issues
 
 ---
 
-## 10. Communication Plan
+## 📞 Communication Plan
 
-### 10.1 Stakeholder Matrix
+### Stakeholder Communication
 
-| Stakeholder | Role | Interest Level | Communication Frequency | Method |
-|------------|------|---------------|------------------------|--------|
-| **Project Sponsor** | Decision maker | HIGH | Weekly | Email summary |
-| **Development Team** | Executors | HIGH | Daily | Standup, Slack |
-| **QA Engineer** | Quality gatekeeper | HIGH | Daily | Standup, direct |
-| **End Users** | Consumers | MEDIUM | At deployment | Release notes |
-| **Management** | Oversight | MEDIUM | Bi-weekly | Status report |
-| **DevOps** | Infrastructure | LOW | As needed | Direct contact |
+#### Pre-Migration (Week before start)
 
-### 10.2 Communication Schedule
+**Audience:** Product Owner, Stakeholders  
+**Message:** "We're planning to upgrade our Angular framework to the latest version (20) to improve performance, reduce technical debt, and align with modern standards. This will not change any user-facing features but will set us up for easier maintenance and faster development in the future."
 
-**Kickoff Meeting (Feb 17, 2026):**
-- Review migration plan
-- Assign roles and responsibilities
-- Set expectations
-- Q&A session
-- **Duration:** 1 hour
-- **Attendees:** All stakeholders
-
-**Weekly Status Updates (Every Friday):**
-- Progress summary
-- Completed phases
-- Metrics dashboard
-- Risks and issues
-- Next week's plan
-- **Format:** Email + optional quick call
-- **Recipients:** Project Sponsor, Management
-
-**Daily Standups (Mon-Fri during migration):**
-- See 9.3 above
-
-**Phase Completion Reviews:**
-- After Phases 2, 3, 4, 7
-- Review deliverables
-- Validate exit criteria
-- Get approval to proceed
-- **Duration:** 30 minutes each
-- **Attendees:** Technical Lead, Code Reviewer, PM
-
-**Pre-Deployment Demo (Feb 26, 2026):**
-- Staging environment walkthrough
-- Show new features and improvements
-- Performance metrics
-- Q&A
-- **Duration:** 45 minutes
-- **Attendees:** All stakeholders
-
-**Post-Migration Retrospective (Mar 7, 2026):**
-- What went well?
-- What could be improved?
-- Lessons learned
-- Future recommendations
-- **Duration:** 1 hour
-- **Attendees:** Development team, PM
-
-### 10.3 Status Reporting
-
-**Weekly Status Report Template:**
-
-```
-ANGULAR 16→20 MIGRATION - WEEK [X] STATUS
-
-Completed This Week:
-- [Phase/Task]
-- [Metrics]
-
-In Progress:
-- [Current phase]
-- [Blockers if any]
-
-Planned for Next Week:
-- [Upcoming phases]
-
-Metrics:
-- Timeline: [On track / X hours ahead/behind]
-- Quality: [Tests passing X/Y]
-- Performance: [Metrics]
-
-Risks & Issues:
-- [Any concerns]
-
-Overall Status: 🟢 Green / 🟡 Yellow / 🔴 Red
-```
-
-### 10.4 Issue Escalation Path
-
-**Level 1: Developer resolves (0-2 hours)**
-- Technical issues within normal scope
-- Code refactoring challenges
-- Test failures
-
-**Level 2: Technical Lead resolves (2-4 hours)**
-- Architecture decisions
-- Blocking technical issues
-- Third-party library problems
-
-**Level 3: Project Sponsor decides (4+ hours)**
-- Scope changes
-- Timeline adjustments
-- Resource allocation
-- Rollback decisions
+**Delivery Method:** Email + brief presentation
 
 ---
 
-## 11. Post-Migration Action Items
+#### During Migration (Weekly updates)
 
-### 11.1 Immediate Post-Deployment (Days 1-7)
+**Audience:** Product Owner, Stakeholders, Team  
+**Message:** Status update following this template:
 
-**Monitoring:**
-- [ ] Set up error monitoring dashboard
-- [ ] Track performance metrics hourly (first 24h), then daily
-- [ ] Monitor user feedback channels
-- [ ] Log any anomalies or issues
+```
+SUBJECT: Angular 20 Migration - Week [X] Status
 
-**Support:**
-- [ ] Technical Lead on-call for critical issues
-- [ ] Quick response team for bugs (4-hour SLA)
-- [ ] Daily status checks with stakeholders
+PROGRESS:
+✅ Completed: [List of phases completed]
+🚧 In Progress: [Current phase]
+📅 Next Up: [Next phase]
 
-### 11.2 First Month Objectives
+METRICS:
+- Tests Passing: [X]%
+- Components Migrated: [X]/4
+- On Schedule: Yes/No
 
-**Optimization:**
-- [ ] Review bundle size optimization opportunities
-- [ ] Consider pure pipe usage for performance
-- [ ] Evaluate lazy loading for future components
-- [ ] Review and optimize change detection further
+BLOCKERS:
+[Any issues or risks]
 
-**Documentation:**
-- [ ] Create video walkthrough of new codebase structure
-- [ ] Update internal wiki with Angular 20 patterns
-- [ ] Document lessons learned
-- [ ] Create troubleshooting guide
+NEXT WEEK:
+[Plan for next week]
+```
 
-**Team Enablement:**
-- [ ] Conduct brown-bag session on Signals for wider team
-- [ ] Share migration experience with other teams
-- [ ] Update coding standards across organization
-- [ ] Contribute to internal Angular knowledge base
-
-### 11.3 Future Enhancements (Post-Migration)
-
-**Phase 6.5: Zoneless Migration (If Deferred)**
-- Timeline: 1-2 months after stable Phase 8
-- Effort: 3-4 hours
-- Goal: Remove zone.js, fully zoneless
-
-**Phase 9: Forms Optimization**
-- Migrate to Reactive Forms with Signal patterns
-- Implement form validation improvements
-- Effort: 6-8 hours
-
-**Phase 10: State Management**
-- Evaluate NgRx SignalStore or Akita
-- Implement for complex state scenarios
-- Effort: 8-12 hours
-
-**Phase 11: Performance Optimization**
-- Implement lazy loading for routes
-- Add virtual scrolling if needed
-- Further bundle size optimization
-- Effort: 4-6 hours
-
-**Phase 12: Progressive Web App**
-- Add service worker
-- Offline capabilities
-- Install prompt
-- Effort: 8-10 hours
-
-### 11.4 Knowledge Transfer
-
-**Documentation Deliverables:**
-- ✅ Updated README.md
-- ✅ Migration Narrative (this document's companion)
-- ✅ Angular 20 Coding Standards
-- ✅ Rollback Procedures
-- ✅ Troubleshooting Guide
-- ✅ Video: "Angular 20 Codebase Tour"
-- ✅ Video: "Signal State Management Patterns"
-
-**Training Deliverables:**
-- ✅ Signals workshop slides and recordings
-- ✅ Modern Angular patterns guide
-- ✅ Code examples repository
-- ✅ FAQs document
+**Delivery Method:** Email or Slack update
 
 ---
 
-## 12. Appendices
+#### Pre-Deployment (Before production release)
 
-### Appendix A: Command Reference
+**Audience:** All stakeholders, Support team, Users (if applicable)  
+**Message:** "We're deploying an infrastructure upgrade this [date]. You should not notice any changes to functionality, but please report any issues immediately. Expected downtime: [X minutes, if any]."
 
-**Setup Commands:**
-```bash
-# Create feature branch
-git checkout -b feature/angular-20-migration
-
-# Create backup tag
-git tag v16-migration-start
-git push origin v16-migration-start
-```
-
-**Migration Commands:**
-```bash
-# Update Angular
-ng update @angular/cli@20 @angular/core@20
-
-# Install dependencies
-npm install
-
-# Build
-ng build
-
-# Serve
-ng serve
-
-# Test
-ng test
-
-# Lint
-ng lint
-```
-
-**Rollback Commands:**
-```bash
-# Emergency rollback
-git checkout main
-git branch -D feature/angular-20-migration
-npm install
-
-# Phase rollback
-git reset --hard <phase-completion-commit-hash>
-```
-
-### Appendix B: Code Patterns Quick Reference
-
-**Before (Angular 16):**
-```typescript
-// Component
-@Component({ selector: 'app-example' })
-export class ExampleComponent {
-  @Input() data: string;
-  @Output() change = new EventEmitter();
-  count = 0;
-  
-  constructor(private service: MyService) {}
-}
-
-// Template
-<div *ngIf="count > 0">
-  <ul>
-    <li *ngFor="let item of items">{{ item }}</li>
-  </ul>
-</div>
-```
-
-**After (Angular 20):**
-```typescript
-// Component
-@Component({ 
-  selector: 'app-example',
-  standalone: true,
-  changeDetection: ChangeDetectionStrategy.OnPush
-})
-export class ExampleComponent {
-  data = input<string>('');
-  change = output();
-  count = signal(0);
-  
-  private service = inject(MyService);
-}
-
-// Template
-@if (count() > 0) {
-  <ul>
-    @for (item of items(); track item.id) {
-      <li>{{ item }}</li>
-    }
-  </ul>
-}
-```
-
-### Appendix C: Testing Pattern Reference
-
-**Before (Module-based Test):**
-```typescript
-beforeEach(async () => {
-  await TestBed.configureTestingModule({
-    declarations: [ExampleComponent],
-    imports: [HttpClientTestingModule],
-    providers: [ExampleService]
-  }).compileComponents();
-});
-```
-
-**After (Standalone Test):**
-```typescript
-beforeEach(async () => {
-  await TestBed.configureTestingModule({
-    imports: [ExampleComponent, HttpClientTestingModule],
-    providers: [ExampleService]
-  }).compileComponents();
-});
-
-// Testing Signal inputs
-fixture.componentRef.setInput('data', 'test value');
-
-// Testing Signal state
-component.count.set(5);
-expect(component.count()).toBe(5);
-```
-
-### Appendix D: Resource Links
-
-**Official Angular Documentation:**
-- Angular Signals: https://angular.dev/guide/signals
-- Standalone Components: https://angular.dev/guide/components/importing
-- Modern Control Flow: https://angular.dev/api/core/@if
-- inject() Function: https://angular.dev/api/core/inject
-- Migration Guide: https://update.angular.io/
-
-**Training Resources:**
-- Angular Signals Deep Dive (YouTube)
-- Standalone Components Tutorial
-- Modern Angular Patterns Course
-
-**Internal Resources:**
-- Company Angular Style Guide
-- Migration Narrative Document
-- Team Slack Channel: #angular-migration
-
-### Appendix E: Contact Information
-
-| Role | Name | Email | Slack | Availability |
-|------|------|-------|-------|--------------|
-| **Technical Lead** | [TBD] | [TBD] | @[handle] | Mon-Fri 9-6 |
-| **Developer** | [TBD] | [TBD] | @[handle] | Mon-Fri 9-6 |
-| **QA Engineer** | [TBD] | [TBD] | @[handle] | Mon-Fri 9-5 |
-| **Project Sponsor** | [TBD] | [TBD] | @[handle] | By appointment |
+**Delivery Method:** Email + in-app notification (if applicable)
 
 ---
 
-## 13. Approval & Sign-Off
+#### Post-Deployment (After production release)
 
-### Plan Approval
+**Audience:** All stakeholders  
+**Message:** "Angular 20 migration successfully deployed! Performance improvements observed: [metrics]. Zero user-facing changes as planned."
 
-| Stakeholder | Role | Approval Status | Date | Signature |
-|------------|------|----------------|------|-----------|
-| [Name] | Project Sponsor | ⏳ Pending | | |
-| [Name] | Technical Lead | ⏳ Pending | | |
-| [Name] | Development Manager | ⏳ Pending | | |
-| [Name] | QA Lead | ⏳ Pending | | |
-
-### Phase Completion Sign-Off
-
-To be completed as each phase finishes:
-
-| Phase | Completion Date | Signed Off By | Status |
-|-------|----------------|---------------|--------|
-| Phase 1: Pre-Migration | | | ⏳ |
-| Phase 2: Angular Update | | | ⏳ |
-| Phase 3: Standalone Components | | | ⏳ |
-| Phase 4: Module Elimination | | | ⏳ |
-| Phase 5: Service Modernization | | | ⏳ |
-| Phase 6: Zoneless (Optional) | | | ⏳ |
-| Phase 7: Testing & QA | | | ⏳ |
-| Phase 8: Documentation | | | ⏳ |
+**Delivery Method:** Email + team celebration
 
 ---
 
-## 14. Conclusion
+### Team Communication
 
-This migration plan provides a comprehensive, phased approach to upgrading the Angular 16 CRUD application to Angular 20. The plan balances thoroughness with pragmatism, providing clear deliverables, exit criteria, and risk mitigation strategies at each phase.
+#### Daily Standups (during migration)
 
-### Key Success Factors
+**Agenda:**
+- What was completed yesterday
+- What will be done today
+- Any blockers
 
-1. **Methodical Execution:** Follow the phases sequentially, validating each before proceeding
-2. **Team Alignment:** Ensure all team members understand Signals and modern Angular patterns
-3. **Continuous Testing:** Don't wait until Phase 7; test continuously throughout
-4. **Clear Communication:** Keep stakeholders informed of progress and issues
-5. **Flexible Approach:** Be ready to adjust the plan based on learnings
-
-### Expected Outcomes
-
-**By March 8, 2026, we will have:**
-- ✅ A fully modernized Angular 20 application
-- ✅ 100% standalone components with Signal-based state management
-- ✅ Improved performance (15-30% faster)
-- ✅ Smaller bundle size (10-15% reduction)
-- ✅ Future-proof architecture aligned with Angular's direction
-- ✅ Enhanced developer experience with simpler, more reactive code
-- ✅ Comprehensive documentation and team knowledge transfer
-
-### Next Steps
-
-1. **Immediate (This Week):**
-   - Review and approve this plan
-   - Assign team roles and responsibilities
-   - Schedule pre-migration training
-   - Set up communication channels
-
-2. **Week 1 (Feb 17, 2026):**
-   - Conduct kickoff meeting
-   - Begin Phase 1: Pre-Migration Preparation
-   - Execute Phases 2-4
-
-3. **Week 2-3:**
-   - Complete remaining phases
-   - Deploy to staging and production
-   - Conduct retrospective
-
-**Let's build a modern, performant, and maintainable Angular 20 application!** 🚀
+**Focus:** Keep team aligned on parallel work
 
 ---
 
-**Plan Document Version:** 1.0  
-**Created By:** Migration Planning Agent  
-**Creation Date:** February 15, 2026  
+#### Mid-Migration Review (After Phase 3)
+
+**Audience:** Dev team  
+**Agenda:**
+- Review progress so far
+- Discuss any challenges with Signals or new patterns
+- Adjust plan if needed
+- Q&A on Angular 20 features
+
+**Delivery Method:** Team meeting, 30 minutes
+
+---
+
+#### Post-Migration Retrospective
+
+**Audience:** Full team  
+**Agenda:**
+- What went well
+- What could be improved
+- Lessons learned for future migrations
+- Celebrate success
+
+**Delivery Method:** Team meeting, 1 hour
+
+---
+
+## 📚 Training & Knowledge Transfer
+
+### Team Training Plan
+
+#### Pre-Migration Training (2 hours, before Phase 1)
+
+**Topics:**
+1. **Angular Signals (45 min)**
+   - What are Signals and why use them
+   - `signal()`, `computed()`, `effect()`
+   - Converting from properties to Signals
+   - Live coding examples
+
+2. **Modern Control Flow (20 min)**
+   - `@if`, `@for`, `@switch` syntax
+   - Why it's better than `*ngIf` / `*ngFor`
+   - Track expressions in `@for`
+   - Live coding examples
+
+3. **inject() Function (15 min)**
+   - Replacing constructor DI
+   - Benefits and limitations
+   - Live coding examples
+
+4. **Standalone Components (20 min)**
+   - What standalone means
+   - How to migrate from modules
+   - Import/export patterns
+   - Live coding examples
+
+5. **Q&A (20 min)**
+
+**Deliverable:** Recorded session + slides shared with team
+
+---
+
+#### Post-Migration Knowledge Sharing (1 hour, after Phase 8)
+
+**Topics:**
+1. **Architecture Tour (20 min)**
+   - Walk through migrated codebase
+   - Point out key patterns
+   - Explain decisions made
+
+2. **Best Practices (15 min)**
+   - When to use Signals vs Observables
+   - Component design patterns
+   - Testing strategies
+
+3. **Common Pitfalls (10 min)**
+   - What to avoid
+   - Common mistakes and how to fix them
+
+4. **Future Roadmap (15 min)**
+   - What's next for the codebase
+   - When to consider zoneless
+   - Other Angular 20 features to explore
+
+**Deliverable:** Updated developer onboarding docs
+
+---
+
+### Documentation Deliverables
+
+1. **Migration Narrative** (`Reports/migration-narrative.md`)
+   - Generated by Migration Documentation Agent
+   - Complete story of the migration
+   - Before/after code examples
+   - Architectural decisions
+
+2. **Developer Guide Updates**
+   - How to create new components (standalone pattern)
+   - How to manage state (Signals)
+   - How to inject dependencies
+   - How to write tests
+
+3. **Quick Reference Cards**
+   - Signals cheat sheet
+   - Control flow syntax reference
+   - inject() usage patterns
+   - Testing patterns
+
+---
+
+## 🎯 Project Milestones
+
+### Key Milestones & Dates (Example timeline for 2-week plan)
+
+| Milestone | Target Date | Owner | Status |
+|-----------|------------|-------|--------|
+| **M1:** Migration plan approved | Feb 15, 2026 | Planning Agent | ✅ Complete |
+| **M2:** Feature branch created, baseline established | Feb 18, 2026 | Lead Dev | 🔲 Not Started |
+| **M3:** Angular 20 upgrade complete | Feb 19, 2026 | Lead Dev | 🔲 Not Started |
+| **M4:** All components standalone | Feb 22, 2026 | Dev Team | 🔲 Not Started |
+| **M5:** Modules eliminated | Feb 25, 2026 | Lead Dev | 🔲 Not Started |
+| **M6:** All tests passing | Feb 27, 2026 | QA Engineer | 🔲 Not Started |
+| **M7:** PR approved | Feb 28, 2026 | Senior Dev | 🔲 Not Started |
+| **M8:** Deployed to staging | Mar 3, 2026 | Lead Dev | 🔲 Not Started |
+| **M9:** Deployed to production | Mar 5, 2026 | Lead Dev | 🔲 Not Started |
+| **M10:** Project complete (48hr monitoring) | Mar 8, 2026 | Lead Dev | 🔲 Not Started |
+
+### Milestone Approval Gates
+
+**Each milestone requires approval before proceeding:**
+
+- **M1:** ✅ Stakeholder sign-off on plan
+- **M2:** ✅ Lead Developer confirmation
+- **M3:** ✅ Application compiles and runs
+- **M4:** ✅ Code review approval
+- **M5:** ✅ Architecture review
+- **M6:** ✅ QA sign-off
+- **M7:** ✅ Code review and stakeholder approval
+- **M8:** ✅ Staging smoke tests pass
+- **M9:** ✅ Go/No-Go decision from stakeholders
+- **M10:** ✅ No critical production issues
+
+---
+
+## 🔄 Continuous Integration & Deployment
+
+### CI/CD Pipeline Updates
+
+The Angular 20 migration should work with existing CI/CD pipelines, but verify:
+
+#### Build Pipeline
+```yaml
+# Example GitHub Actions / Azure DevOps steps
+- name: Install dependencies
+  run: npm ci
+
+- name: Build application
+  run: npm run build -- --configuration production
+
+- name: Run tests
+  run: npm test -- --watch=false --browsers=ChromeHeadless
+
+- name: Run linting (if configured)
+  run: npm run lint
+
+- name: Archive build artifacts
+  # ... upload dist/ folder
+```
+
+**Changes needed:**
+- None expected, but verify Node.js version is 18+
+
+#### Deployment Pipeline
+- No changes needed for Angular 20
+- Same static file deployment as Angular 16
+
+---
+
+## 📖 Reference Materials
+
+### Essential Links
+
+#### Official Angular Documentation
+- [Angular Signals Guide](https://angular.dev/guide/signals)
+- [Standalone Components](https://angular.dev/guide/components/importing)
+- [Modern Control Flow](https://angular.dev/api/core/@if)
+- [inject() Function](https://angular.dev/api/core/inject)
+- [Angular Update Guide](https://update.angular.io/)
+
+#### Changelogs
+- [Angular 17 Release](https://blog.angular.io/introducing-angular-v17-4d7033312e4b)
+- [Angular 18 Release](https://blog.angular.io/angular-v18-is-now-available-e79d5ac0affe)
+- [Angular 19 Release](https://blog.angular.io/angular-v19-is-now-available-2c41b2f33ae7)
+- [Angular 20 Changelog](https://github.com/angular/angular/releases)
+
+#### Community Resources
+- [Angular Blog](https://blog.angular.io/)
+- [Angular GitHub](https://github.com/angular/angular)
+- [Stack Overflow - Angular](https://stackoverflow.com/questions/tagged/angular)
+
+---
+
+## 🏁 Next Steps
+
+### Immediate Actions (This Week)
+
+1. **Review this plan** with the development team
+   - Schedule 1-hour review meeting
+   - Discuss timeline options
+   - Assign roles
+
+2. **Get stakeholder approval**
+   - Present plan to product owner
+   - Confirm timeline
+   - Get go-ahead for migration
+
+3. **Schedule team training**
+   - Book 2-hour session before migration starts
+   - Prepare training materials
+   - Record session for future reference
+
+4. **Set up infrastructure**
+   - Ensure staging environment available
+   - Verify backup procedures
+   - Confirm CI/CD pipeline access
+
+5. **Begin Phase 1: Preparation**
+   - Create git tag and feature branch
+   - Run baseline tests
+   - Document current metrics
+
+---
+
+## ✅ Approval & Sign-Off
+
+### Required Approvals
+
+| Role | Name | Signature | Date |
+|------|------|-----------|------|
+| **Product Owner** | _______ | _________ | _____ |
+| **Lead Developer** | _______ | _________ | _____ |
+| **Tech Lead / Architect** | _______ | _________ | _____ |
+| **QA Lead** | _______ | _________ | _____ |
+
+### Approval Criteria Met
+
+- [ ] Migration plan reviewed and understood
+- [ ] Timeline is realistic and approved
+- [ ] Resources allocated
+- [ ] Training scheduled
+- [ ] Risks identified and mitigation plans in place
+- [ ] Rollback procedures documented
+- [ ] Success metrics defined
+
+---
+
+## 📄 Appendix
+
+### A. Phase Dependencies Diagram
+
+```
+Phase 1: Preparation (MUST COMPLETE FIRST)
+    ↓
+Phase 2: Angular Upgrade (BLOCKING)
+    ↓
+Phase 3.1: AppComponent (MUST COMPLETE FIRST)
+    ↓
+    ├─→ Phase 3.2: AddTutorial ──┐
+    ├─→ Phase 3.3: TutorialsList ─┤ (Parallel)
+    └─→ Phase 3.4: TutorialDetails┘
+         ↓
+Phase 4: Module Elimination
+    ↓
+    ├─→ Phase 5: Service ─┐ (Can be parallel)
+    └─→ Phase 6: Zoneless ┘ (Optional)
+         ↓
+Phase 7: Testing & QA
+    ↓
+Phase 8: Documentation & Deployment
+```
+
+---
+
+### B. File Change Summary
+
+#### Files to CREATE:
+- `src/app/app.routes.ts` (new routing file)
+- `Reports/migration-narrative.md` (documentation)
+- Various test files updates
+
+#### Files to DELETE:
+- `src/app/app.module.ts`
+- `src/app/app-routing.module.ts`
+
+#### Files to MODIFY:
+- `src/main.ts` (complete rewrite)
+- `src/app/app.component.ts` (standalone conversion)
+- `src/app/components/add-tutorial/add-tutorial.component.ts`
+- `src/app/components/add-tutorial/add-tutorial.component.html`
+- `src/app/components/tutorials-list/tutorials-list.component.ts`
+- `src/app/components/tutorials-list/tutorials-list.component.html`
+- `src/app/components/tutorial-details/tutorial-details.component.ts`
+- `src/app/components/tutorial-details/tutorial-details.component.html`
+- `src/app/services/tutorial.service.ts`
+- All `*.spec.ts` files
+- `package.json` (dependencies)
+- `angular.json` (polyfills, if zoneless)
+- `tsconfig.json` (compiler options)
+- `README.md` (project info)
+
+**Total files impacted:** ~20 files
+
+---
+
+### C. Glossary
+
+**Signal:** A reactive primitive in Angular that wraps a value and notifies when it changes
+
+**Standalone Component:** A component that declares its own dependencies without NgModule
+
+**inject():** Function-based dependency injection, alternative to constructor injection
+
+**OnPush:** Change detection strategy that only checks when inputs change or events fire
+
+**Zoneless:** Running Angular without zone.js for improved performance
+
+**toSignal():** Utility to convert Observables to Signals
+
+**@if/@for/@switch:** Modern control flow syntax replacing `*ngIf`, `*ngFor`, `*ngSwitch`
+
+---
+
+## 📋 Project Summary
+
+### Project Information
+
+- **Project Name:** Angular 16 to 20 Migration
+- **Project Code:** ANG20-MIGRATION-001
+- **Start Date:** February 18, 2026 (planned)
+- **End Date:** March 8, 2026 (planned)
+- **Duration:** 3 weeks
+- **Effort:** 30-40 hours total
+- **Team Size:** 1-4 developers
+- **Recommended Timeline:** Option B (2 weeks, balanced approach)
+
+### Executive Summary for Leadership
+
+"This migration plan outlines a comprehensive, low-risk approach to upgrading our Angular CRUD application from version 16 to version 20. The migration will modernize our codebase to use Angular's latest patterns (Signals, standalone components, modern control flow) which will improve performance by 10-15%, reduce bundle size, and align us with Angular's future direction. The migration is broken into 8 phases with clear checkpoints and rollback procedures. User-facing functionality will not change. Estimated timeline is 2-3 weeks with minimal risk to production stability."
+
+---
+
+**Plan Status:** ✅ APPROVED and READY FOR EXECUTION  
+**Next Action:** Proceed to Phase 1 - Pre-Migration Preparation
+
+---
+
+*This migration plan was created by the Angular Migration Planning Agent based on the comprehensive assessment report. All recommendations follow Angular 20 best practices and the project-specific coding standards defined in the migration instructions.*
+
+**Document Version:** 1.0  
 **Last Updated:** February 15, 2026  
-**Next Review Date:** February 17, 2026 (Kickoff)
-
----
-
-*This plan is a strategic READ-ONLY document. Implementation should be executed by the Migration Implementation Agent following this plan as a guide.*
+**Generated By:** Migration Planning Agent (migration-planning mode)
