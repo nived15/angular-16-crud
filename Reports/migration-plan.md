@@ -10,31 +10,32 @@
 
 ## 📋 Executive Summary
 
-This document provides a comprehensive, actionable migration plan for upgrading the Angular 16 CRUD application to Angular 20. The plan is based on the detailed assessment report and outlines a strategic, phased approach designed to minimize risk while maximizing efficiency.
+This document provides a **simplified demo migration plan** for upgrading the Angular 16 CRUD application to Angular 20. This reduced scope is designed to showcase key Angular 20 features while keeping legacy components as examples of "before/after" comparison.
 
-### Project Scope
-- **Components to Migrate:** 4 (AppComponent + 3 feature components)
-- **Services to Modernize:** 1 (TutorialService)
-- **Modules to Eliminate:** 2 (AppModule, AppRoutingModule)
-- **Templates to Update:** 4 (control flow syntax migration)
-- **Configuration Files:** 5 (main.ts, angular.json, tsconfig.json, package.json, routes)
+### Demo Project Scope
+- **Components to Migrate:** 2 (AppComponent + AddTutorialComponent)
+- **Components Kept as Legacy Examples:** 2 (TutorialsListComponent, TutorialDetailsComponent)
+- **Services:** TutorialService will use inject() in migrated components
+- **Modules:** Hybrid approach - migrated components standalone, others remain module-based
+- **Templates to Update:** 2 (control flow syntax migration for demo components only)
+- **Configuration Files:** 2 (main.ts for bootstrapping, minimal tsconfig updates)
 
-### Key Objectives
-1. ✅ Migrate from module-based to standalone architecture
-2. ✅ Convert all state management to Signals
-3. ✅ Modernize control flow syntax (`*ngIf`/`*ngFor` → `@if`/`@for`)
-4. ✅ Replace constructor-based DI with `inject()` function
-5. ✅ Implement OnPush change detection across all components
-6. ✅ Prepare for optional zoneless mode
-7. ✅ Maintain 100% functional parity with zero regressions
+### Demo Objectives
+1. ✅ Demonstrate standalone component architecture (2 components)
+2. ✅ Showcase Signals-based state management
+3. ✅ Highlight modern control flow syntax (`@if`/`@for`)
+4. ✅ Show `inject()` function vs constructor DI
+5. ✅ Display OnPush change detection benefits
+6. ✅ Maintain working legacy components for comparison
+7. ✅ Quick demo-ready implementation (3-4 hours total)
 
-### Success Criteria
+### Demo Success Criteria
 - Zero TypeScript compilation errors
-- 100% test pass rate (all existing tests updated and passing)
-- All CRUD operations functioning correctly
-- Bundle size reduced by 10-15%
-- Performance maintained or improved
-- Clean code with zero legacy patterns
+- Migrated components working correctly (Add Tutorial functionality)
+- Legacy components remain functional (for comparison)
+- Clear demonstration of Angular 20 features
+- Side-by-side code comparison capability
+- Quick setup and demo-ready (deployable in 3-4 hours)
 
 ---
 
@@ -43,33 +44,34 @@ This document provides a comprehensive, actionable migration plan for upgrading 
 ### Assessment Summary
 **Source:** [Assessment Report](./assessment-report.md) - Generated February 15, 2026
 
-#### Migration Readiness Score: 65/100
+#### Demo Migration Approach: Hybrid (Partial Migration)
 
-**Strengths:**
-- ✅ Clean component architecture with clear separation of concerns
-- ✅ TypeScript strict mode enabled
-- ✅ Standard Angular CLI project structure
-- ✅ Service already using `providedIn: 'root'`
-- ✅ Good foundation for migration
+**Demo Strategy:**
+- ✅ Migrate 2 components to showcase Angular 20 features
+- ✅ Keep 2 components legacy for before/after comparison
+- ✅ Hybrid architecture allows gradual migration demonstration
+- ✅ Perfect for training and stakeholder demos
+- ✅ Reduced complexity for quick implementation
 
-**Weaknesses:**
-- ❌ 100% module-based architecture (no standalone components)
-- ❌ Zero Signal usage (all traditional state management)
-- ❌ Legacy control flow throughout all templates
-- ❌ Constructor-based dependency injection
-- ❌ No change detection optimization
+**Migration Targets:**
+- ✅ AppComponent - Root component (simple demonstration)
+- ✅ AddTutorialComponent - Form handling with Signals
+- ⚠️ TutorialsListComponent - Kept as legacy Angular 16 example
+- ⚠️ TutorialDetailsComponent - Kept as legacy Angular 16 example
 
-#### Complexity Assessment by Component
+#### Demo Scope - Component Assessment
 
-| Component | Lines of Code | Complexity | Priority | Est. Effort |
-|-----------|---------------|------------|----------|-------------|
-| AppComponent | 9 | LOW | HIGH | 30 min |
-| AddTutorialComponent | 42 | MEDIUM | MEDIUM | 2-3 hrs |
-| TutorialsListComponent | 65 | HIGH | HIGH | 4-5 hrs |
-| TutorialDetailsComponent | 93 | HIGH | HIGH | 4-5 hrs |
-| TutorialService | 39 | LOW | MEDIUM | 1-2 hrs |
+| Component | Lines of Code | Status | Priority | Est. Effort |
+|-----------|---------------|--------|----------|-------------|
+| AppComponent | 9 | **MIGRATE** | HIGH | 30 min |
+| AddTutorialComponent | 42 | **MIGRATE** | HIGH | 2 hrs |
+| TutorialsListComponent | 65 | **KEEP LEGACY** | N/A | 0 hrs |
+| TutorialDetailsComponent | 93 | **KEEP LEGACY** | N/A | 0 hrs |
+| TutorialService | 39 | **UPDATE DI** | LOW | 30 min |
 
-**Total Estimated Effort:** 16-24 hours of focused development
+**Total Demo Effort:** 3-4 hours of focused development
+
+**Rationale:** By keeping 2 components in Angular 16 style, we create a perfect before/after demonstration while reducing implementation time by 75%.
 
 ---
 
