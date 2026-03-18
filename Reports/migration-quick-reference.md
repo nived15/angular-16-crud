@@ -34,70 +34,72 @@
 | `HttpClientModule` | `provideHttpClient()` |
 | `platformBrowserDynamic()` | `bootstrapApplication()` |
 
-## 📋 Migration Phases (8 Total)
+## 📋 Demo Migration Phases (4 Total)
 
-### Phase 1: Preparation (2-3 hrs)
-- Backup & branch setup
-- Dependency audit
-- Test baseline
+### Phase 1: Preparation (30 min)
+- Create demo branch
+- Verify app works
+- Document baseline
 
-### Phase 2: Core Update (3-4 hrs)
-- Run `ng update @angular/core@20`
-- Fix breaking changes
-- Verify build
+### Phase 2: Component Migration (2.5 hrs)
+- Migrate AppComponent (30 min)
+- Migrate AddTutorialComponent (2 hrs)
+- Implement all Angular 20 patterns
 
-### Phase 3: Standalone Components (6-8 hrs)
-- Convert all 4 components
-- Implement Signals
-- Update templates
+### Phase 3: Legacy Markers (15 min)
+- Add TODO comments to legacy components
+- Update AppModule for hybrid approach
+- Verify hybrid architecture works
 
-### Phase 4: Module Elimination (1-2 hrs)
-- Create app.routes.ts
-- Update main.ts
-- Delete modules
+### Phase 4: Demo Validation (30 min)
+- Test all functionality
+- Document before/after
+- Prepare demo presentation
 
-### Phase 5: Service Modernization (1-2 hrs)
-- Update DI pattern
-- Add type safety
+## ⚠️ Demo Critical Points
 
-### Phase 6: Zoneless (Optional, 2-3 hrs)
-- Remove zone.js
-- Performance testing
+### Must Migrate (2 Components)
+- ✅ AppComponent → standalone
+- ✅ AddTutorialComponent → standalone + Signals
 
-### Phase 7: Testing & QA (3-4 hrs)
-- Update unit tests
-- E2E testing
-- Performance audit
+### Must Keep Legacy (2 Components)
+- ⚠️ TutorialsListComponent → Angular 16 example
+- ⚠️ TutorialDetailsComponent → Angular 16 example
 
-### Phase 8: Documentation (1-2 hrs)
-- Update README
-- Team training
+### Hybrid Architecture
+- ✅ AppModule imports standalone AppComponent
+- ✅ Module-based routing still works
+- ✅ Mix of standalone and module components
+- ✅ Gradual migration demonstration
 
-## ⚠️ Critical Migration Points
+### Angular 20 Features to Showcase
+1. **Standalone components** - `standalone: true`
+2. **Signals** - `signal()`, `.set()`, `()`  
+3. **Modern control flow** - `@if`, `@for`
+4. **inject() function** - No constructor DI
+5. **OnPush** - Optimized change detection
 
-### Must Convert
-- ✅ All 4 components → standalone
-- ✅ All templates → modern control flow
-- ✅ All DI → inject() function
-- ✅ All inputs → input() function
-- ✅ All state → Signals
-- ✅ main.ts → bootstrapApplication()
-- ✅ HttpClientModule → provideHttpClient()
+## 🧪 Demo Testing Checklist
 
-### High Risk Areas
-1. **Template-driven forms** with ngModel
-2. **Observable subscriptions** (use toSignal())
-3. **Route params** in TutorialDetailsComponent
+### Migrated Components (Must Work)
+- [ ] AppComponent displays
+- [ ] Add Tutorial page loads
+- [ ] Form accepts input
+- [ ] Submit creates tutorial
+- [ ] Success message shows
+- [ ] Reset button works
 
-## 🧪 Testing Checklist
+### Legacy Components (Must Still Work)
+- [ ] Tutorials list displays
+- [ ] Search functionality works
+- [ ] Tutorial details display
+- [ ] All CRUD operations functional
 
-### Functional Tests
-- [ ] Create new tutorial
-- [ ] View tutorials list
-- [ ] Search by title
-- [ ] View tutorial details
-- [ ] Edit tutorial
-- [ ] Delete tutorial
+### Demo Validation
+- [ ] Side-by-side code comparison ready
+- [ ] Can explain each Angular 20 feature
+- [ ] Screenshots/video prepared
+- [ ] Talking points documented
 - [ ] Delete all tutorials
 - [ ] Navigation between routes
 

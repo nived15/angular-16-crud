@@ -1,421 +1,263 @@
-# Angular 16 → 20 Migration Checklist
+# Angular 16 → 20 Demo Migration Checklist
 
-Use this checklist to track your migration progress. Check off items as you complete them.
+**Demo Scope:** Partial migration of 2 components (AppComponent + AddTutorialComponent)  
+**Legacy Components:** 2 components kept as Angular 16 examples for comparison  
+**Estimated Time:** 3-4 hours
+
+Use this checklist to track your demo migration progress.
 
 ---
 
-## Pre-Migration Setup
+## Pre-Migration Setup (30 min)
 
 ### Preparation
-- [ ] Read full [assessment report](./assessment-report.md)
+- [ ] Read [assessment report](./assessment-report.md) - Demo scope section
 - [ ] Review [component migration guide](./component-migration-guide.md)
-- [ ] Team meeting scheduled and migration plan approved
-- [ ] Create backup of entire codebase
-- [ ] Create feature branch: `git checkout -b feature/angular-20-migration`
-- [ ] Ensure all current tests are passing
-- [ ] Document current bundle size for comparison
-- [ ] Set up testing environment
+- [ ] Create demo branch: `git checkout -b demo/angular-20-migration`
+- [ ] Ensure current app runs: `ng serve`
+- [ ] Test "Add Tutorial" feature works
+- [ ] Take screenshot/video of current state
 
-### Baseline Metrics
-- [ ] Record current bundle size: _________ KB
-- [ ] Record current test pass rate: _________ %
-- [ ] Record current Lighthouse score: _________
-- [ ] Record current load time: _________ seconds
+### Demo Baseline
+- [ ] App loads without errors: ✓ / ✗
+- [ ] Add Tutorial works: ✓ / ✗
+- [ ] Ready to begin migration: ✓ / ✗
 
 ---
 
-## Phase 1: Angular Core Update
+## Phase 1: AppComponent Migration (30 min)
 
-### Update Dependencies
-- [ ] Run `ng update @angular/core@20 @angular/cli@20`
-- [ ] Review migration output for warnings
-- [ ] Fix any automatic migration errors
-- [ ] Update `tsconfig.json` if needed
-- [ ] Run `npm install` to ensure clean install
-- [ ] Verify `ng serve` runs without errors
-- [ ] Check browser console for errors
-- [ ] Run tests: `npm test`
-
-### Verify Build
-- [ ] Application compiles successfully
-- [ ] Application loads in browser
-- [ ] No console errors on load
-- [ ] Basic navigation works
-
-**Phase 1 Exit Criteria:**
-- [ ] All checklist items above completed
-- [ ] Application runs on Angular 20
-- [ ] No blocking errors
-
----
-
-## Phase 2: Component Migration
-
-### 1. AppComponent
-- [ ] Add `standalone: true`
-- [ ] Add `imports: [RouterOutlet]`
+### Make Standalone
+- [ ] Add `standalone: true` to @Component decorator
+- [ ] Add `imports: [RouterOutlet, CommonModule]`
 - [ ] Add `changeDetection: ChangeDetectionStrategy.OnPush`
-- [ ] Convert `title` property to `signal()`
-- [ ] Update template to read signal with `()`
-- [ ] Test: Application loads and displays correctly
-- [ ] Run component tests
-- [ ] Fix any failing tests
+
+### Convert to Signals
+- [ ] Convert `title` property to `signal('Angular 20 Demo - Hybrid Migration')`
+- [ ] Update template to use `{{ title() }}` if displayed
+
+### Update AppModule
+- [ ] Remove AppComponent from `declarations` array
+- [ ] Add AppComponent to `imports` array
+
+### Test
+- [ ] Application compiles: ✓ / ✗
+- [ ] Application loads in browser: ✓ / ✗
+- [ ] No console errors: ✓ / ✗
+- [ ] Navigation works: ✓ / ✗
 
 **AppComponent Status:** ⬜ Not Started | ⬜ In Progress | ⬜ Complete
 
 ---
 
-### 2. TutorialDetailsComponent
-- [ ] Add `standalone: true`
-- [ ] Add `imports: [FormsModule, RouterLink]`
+## Phase 2: AddTutorialComponent Migration (2 hours)
+
+### Make Standalone
+- [ ] Add `standalone: true` to @Component decorator
+- [ ] Add `imports: [FormsModule, CommonModule]`
 - [ ] Add `changeDetection: ChangeDetectionStrategy.OnPush`
-- [ ] Replace `constructor` DI with `inject()`:
-  - [ ] TutorialService
-  - [ ] ActivatedRoute
-  - [ ] Router
-- [ ] Convert `@Input() viewMode` to `input(false)`
-- [ ] Convert `@Input() currentTutorial` to `input<Tutorial>(defaultValue)`
-- [ ] Convert `message` to `signal('')`
-- [ ] Create `editableTutorial` writable signal
-- [ ] Update `ngOnInit()` to use signal reads `()`
-- [ ] Update `getTutorial()` to use `.set()`
-- [ ] Update `updatePublished()` to use signals
-- [ ] Update `updateTutorial()` to use signals
-- [ ] Update `deleteTutorial()` to use signals
-- [ ] Update template:
-  - [ ] Replace `*ngIf` with `@if`
-  - [ ] Replace `ng-template` with `@else`
-  - [ ] Update all property reads to signal calls
-  - [ ] Fix two-way binding with `.update()`
-- [ ] Test: View mode displays correctly
-- [ ] Test: Edit mode works
-- [ ] Test: Update tutorial
-- [ ] Test: Delete tutorial
-- [ ] Test: Publish/unpublish status
-- [ ] Run component tests
-- [ ] Fix any failing tests
 
-**TutorialDetailsComponent Status:** ⬜ Not Started | ⬜ In Progress | ⬜ Complete
+### Update Dependency Injection
+- [ ] Remove `constructor(private tutorialService: TutorialService)`
+- [ ] Add `tutorialService = inject(TutorialService);`
+- [ ] Add import: `import { inject } from '@angular/core';`
 
----
-
-### 3. AddTutorialComponent
-- [ ] Add `standalone: true`
-- [ ] Add `imports: [FormsModule]`
-- [ ] Add `changeDetection: ChangeDetectionStrategy.OnPush`
-- [ ] Replace `constructor` DI with `inject(TutorialService)`
-- [ ] Convert `tutorial` to `signal<Tutorial>(defaultValue)`
+### Convert State to Signals
+- [ ] Convert `tutorial` object to signal:
+  ```typescript
+  tutorial = signal<Tutorial>({
+    title: '',
+    description: '',
+    published: false
+  });
+  ```
 - [ ] Convert `submitted` to `signal(false)`
-- [ ] Update `saveTutorial()`:
-  - [ ] Read tutorial with `this.tutorial()`
-  - [ ] Set submitted with `this.submitted.set(true)`
-- [ ] Update `newTutorial()`:
-  - [ ] Set submitted with `.set(false)`
-  - [ ] Set tutorial with `.set(defaultValue)`
-- [ ] Update template:
-  - [ ] Replace `*ngIf` with `@if`
-  - [ ] Update signal reads: `submitted()`, `tutorial()`
-  - [ ] Fix two-way binding (split into `[ngModel]` and `(ngModelChange)`)
-- [ ] Test: Form displays correctly
-- [ ] Test: Submit tutorial
-- [ ] Test: "Add" button creates new form
-- [ ] Run component tests
-- [ ] Fix any failing tests
+
+### Update Methods to Use Signals
+- [ ] Update `saveTutorial()` method:
+  - [ ] Read tutorial data using `this.tutorial()`
+  - [ ] Set submitted using `this.submitted.set(true)`
+- [ ] Update `newTutorial()` method:
+  - [ ] Reset submitted: `this.submitted.set(false)`
+  - [ ] Reset tutorial: `this.tutorial.set({ title: '', description: '', published: false })`
+
+### Migrate Template Control Flow
+- [ ] Replace `*ngIf="!submitted"` with `@if (!submitted()) {`
+- [ ] Replace `*ngIf="submitted"` with `@if (submitted()) {`
+- [ ] Add closing braces `}` for @if blocks
+
+### Fix Template Property Bindings
+- [ ] Update all `tutorial.title` references to work with signals
+- [ ] Fix `[(ngModel)]` bindings to work with signal updates
+- [ ] Test form input updates signal correctly
+
+### Add Educational Comments
+- [ ] Add comment: `// Angular 20: Using inject() instead of constructor DI`
+- [ ] Add comment: `// Angular 20: Using Signals for reactive state`
+- [ ] Add comment: `// Angular 20: Modern @if control flow`
+
+### Test AddTutorialComponent
+- [ ] Component compiles: ✓ / ✗
+- [ ] Form displays correctly: ✓ / ✗
+- [ ] Can type in title field: ✓ / ✗
+- [ ] Can type in description field: ✓ / ✗
+- [ ] Submit button works: ✓ / ✗
+- [ ] Success message displays: ✓ / ✗
+- [ ] "Add" button creates new form: ✓ / ✗
+- [ ] No console errors: ✓ / ✗
 
 **AddTutorialComponent Status:** ⬜ Not Started | ⬜ In Progress | ⬜ Complete
 
 ---
 
-### 4. TutorialsListComponent
-- [ ] Add `standalone: true`
-- [ ] Add `imports: [FormsModule, TutorialDetailsComponent]`
-- [ ] Add `changeDetection: ChangeDetectionStrategy.OnPush`
-- [ ] Replace `constructor` DI with `inject(TutorialService)`
-- [ ] Convert properties to signals:
-  - [ ] `tutorials = signal<Tutorial[]>([])`
-  - [ ] `currentTutorial = signal<Tutorial>({})`
-  - [ ] `currentIndex = signal(-1)`
-  - [ ] `title = signal('')`
-- [ ] Update `retrieveTutorials()` to use `.set()`
-- [ ] Update `refreshList()` to use `.set()`
-- [ ] Update `setActiveTutorial()` to use `.set()`
-- [ ] Update `removeAllTutorials()` to use signals
-- [ ] Update `searchTitle()`:
-  - [ ] Read title with `this.title()`
-  - [ ] Set results with `.set()`
-- [ ] Update template:
-  - [ ] Replace `*ngFor` with `@for` (include `track tutorial.id`)
-  - [ ] Replace `*ngIf` with `@if` if used
-  - [ ] Update all property reads to signal calls
-  - [ ] Use `$index` for loop index
-  - [ ] Fix two-way binding on search input
-  - [ ] Pass signals to child component: `[currentTutorial]="currentTutorial()"`
-- [ ] Test: List displays tutorials
-- [ ] Test: Click tutorial selects it
-- [ ] Test: Search by title works
-- [ ] Test: Delete all tutorials
-- [ ] Test: Tutorial details display in sidebar
-- [ ] Run component tests
-- [ ] Fix any failing tests
+## Phase 3: Mark Legacy Components (15 min)
 
-**TutorialsListComponent Status:** ⬜ Not Started | ⬜ In Progress | ⬜ Complete
-
----
-
-**Phase 2 Exit Criteria:**
-- [ ] All 4 components migrated to standalone
-- [ ] All components use Signals
-- [ ] All components use `inject()` for DI
-- [ ] All components use OnPush change detection
-- [ ] All templates use modern control flow
-- [ ] All component tests passing
-- [ ] Full application functionality verified
-
----
-
-## Phase 3: Service Migration
-
-### TutorialService
-- [ ] Add `inject` import from `@angular/core`
-- [ ] Replace `constructor(private http: HttpClient)` with `private http = inject(HttpClient)`
-- [ ] Update type signatures (remove `any`):
-  - [ ] `get(id: string): Observable<Tutorial>`
-  - [ ] `create(data: Partial<Tutorial>): Observable<Tutorial>`
-  - [ ] `update(id: string, data: Partial<Tutorial>): Observable<any>`
-  - [ ] `delete(id: string): Observable<any>`
-  - [ ] `findByTitle(title: string): Observable<Tutorial[]>`
-- [ ] Run service tests
-- [ ] Fix any failing tests
-
-**TutorialService Status:** ⬜ Not Started | ⬜ In Progress | ⬜ Complete
-
----
-
-## Phase 4: Module Elimination
-
-### Create Route Configuration
-- [ ] Create `src/app/app.routes.ts`
-- [ ] Export routes as `const` array:
+### TutorialsListComponent
+- [ ] Add TODO comment at top:
   ```typescript
-  export const routes: Routes = [
-    { path: '', redirectTo: 'tutorials', pathMatch: 'full' },
-    { path: 'tutorials', component: TutorialsListComponent },
-    { path: 'tutorials/:id', component: TutorialDetailsComponent },
-    { path: 'add', component: AddTutorialComponent }
-  ];
+  // TODO: LEGACY COMPONENT - Angular 16 Pattern (Not Migrated)
+  // Kept for before/after comparison in demo
+  // See AddTutorialComponent for Angular 20 patterns
   ```
-- [ ] Test: Routes file compiles
+- [ ] Verify component still works: ✓ / ✗
 
-### Update main.ts
-- [ ] Import `bootstrapApplication` from `@angular/platform-browser`
-- [ ] Import `provideRouter` from `@angular/router`
-- [ ] Import `provideHttpClient` from `@angular/common/http`
-- [ ] Import `provideZoneChangeDetection` from `@angular/core`
-- [ ] Import `AppComponent`
-- [ ] Import `routes` from `./app/app.routes`
-- [ ] Replace `platformBrowserDynamic().bootstrapModule(AppModule)` with:
+### TutorialDetailsComponent
+- [ ] Add TODO comment at top:
   ```typescript
-  bootstrapApplication(AppComponent, {
-    providers: [
-      provideRouter(routes),
-      provideHttpClient(),
-      provideZoneChangeDetection({ eventCoalescing: true })
-    ]
-  })
+  // TODO: LEGACY COMPONENT - Angular 16 Pattern (Not Migrated)
+  // Kept for before/after comparison in demo
+  // See AddTutorialComponent for Angular 20 patterns
   ```
-- [ ] Test: Application compiles
-- [ ] Test: Application loads
-- [ ] Test: All routes work
+- [ ] Verify component still works: ✓ / ✗
 
-### Delete Module Files
-- [ ] Delete `src/app/app.module.ts`
-- [ ] Delete `src/app/app-routing.module.ts`
-- [ ] Search codebase for any remaining module imports
-- [ ] Remove any lingering module references
-- [ ] Test: Application compiles without modules
-- [ ] Test: Full application functionality
-
-**Phase 4 Exit Criteria:**
-- [ ] Zero `*.module.ts` files in `src/app/`
-- [ ] `main.ts` uses standalone bootstrap
-- [ ] All routes working
-- [ ] HTTP calls functioning
-- [ ] No compilation errors
+**Legacy Components Status:** ⬜ Not Started | ⬜ Complete
 
 ---
 
-## Phase 5: Configuration Updates
+## Phase 4: Demo Validation (30 min)
 
-### angular.json
-- [ ] Review polyfills section
-- [ ] Consider removing `zone.js` for zoneless (optional)
-- [ ] Update budget limits if needed
-- [ ] Test build: `ng build --configuration production`
+### Code Comparison Documentation
+- [ ] Create side-by-side comparison:
+  - [ ] AppComponent (Angular 20) vs Legacy
+  - [ ] AddTutorialComponent (Angular 20) vs TutorialsListComponent (Angular 16)
+- [ ] Document key differences spotted:
+  - [ ] `standalone: true`
+  - [ ] Signals vs plain properties
+  - [ ] `inject()` vs constructor DI
+  - [ ] `@if` vs `*ngIf`
+  - [ ] `OnPush` change detection
 
-### tsconfig.json
-- [ ] Update `target` to `ES2023` (optional)
-- [ ] Update `lib` to include `ES2023` (optional)
-- [ ] Review `experimentalDecorators` (can be removed after full Signal migration)
-- [ ] Consider setting `useDefineForClassFields: true`
-- [ ] Test: Application compiles with new config
+### Functional Testing
+- [ ] Navigate to Add Tutorial page
+- [ ] Fill out tutorial form
+- [ ] Submit tutorial
+- [ ] See success message
+- [ ] Click "Add" to reset form
+- [ ] Navigate to Tutorials List (legacy component)
+- [ ] Verify new tutorial appears
+- [ ] All navigation works correctly
 
-### package.json
-- [ ] Verify all Angular packages are @20.x
-- [ ] Check for deprecated dependencies
-- [ ] Consider updating Bootstrap (currently 4.6.2)
-- [ ] Run `npm audit` and fix vulnerabilities
-- [ ] Run `npm outdated` to check for updates
+### Demo Preparation
+- [ ] Take screenshots of:
+  - [ ] Migrated component code
+  - [ ] Legacy component code
+  - [ ] Working application
+- [ ] Record 2-minute demo video (optional)
+- [ ] Prepare talking points:
+  - [ ] Why hybrid migration approach
+  - [ ] Key Angular 20 features shown
+  - [ ] Benefits of gradual migration
+- [ ] Create demo presentation outline
 
----
-
-## Phase 6: Testing & Quality Assurance
-
-### Unit Tests
-- [ ] All component tests updated and passing
-- [ ] All service tests updated and passing
-- [ ] Test coverage >80%
-- [ ] No skipped/disabled tests
-- [ ] Run: `npm test`
-
-### Manual Testing Checklist
-- [ ] **Navigate to tutorials list** - displays correctly
-- [ ] **Click on a tutorial** - details display in sidebar
-- [ ] **Search for tutorial by title** - filters list correctly
-- [ ] **Navigate to Add Tutorial page** - form displays
-- [ ] **Fill out form and submit** - success message shown
-- [ ] **Click "Add" button** - form resets
-- [ ] **Navigate to tutorial details** (full page view)
-- [ ] **Edit tutorial fields** - can type in inputs
-- [ ] **Click Update** - success message shown
-- [ ] **Toggle Published status** - updates correctly
-- [ ] **Click Delete** - navigates back to list
-- [ ] **Click "Remove All"** - deletes all tutorials
-- [ ] **Test browser back/forward buttons** - navigation works
-- [ ] **Refresh page on each route** - loads correctly
-
-### Cross-Browser Testing
-- [ ] Chrome (latest)
-- [ ] Firefox (latest)
-- [ ] Safari (latest)
-- [ ] Edge (latest)
-
-### Performance Testing
-- [ ] Run Lighthouse audit
-- [ ] Record new bundle size: _________ KB
-- [ ] Compare with baseline (target: -10%)
-- [ ] Record new load time: _________ seconds
-- [ ] Compare with baseline
-- [ ] Check for console warnings/errors
-- [ ] Verify change detection efficiency
-
-### Code Quality
-- [ ] Run linter: `ng lint` (if configured)
-- [ ] No TypeScript compilation errors
-- [ ] No template errors
-- [ ] Code formatted consistently
-- [ ] Remove any debug console.logs
+**Demo Validation Status:** ⬜ Not Started | ⬜ Complete
 
 ---
 
-## Phase 7: Documentation
+## Final Demo Checklist
 
-### Code Documentation
-- [ ] Update `README.md` with Angular 20 information
-- [ ] Document new component patterns
-- [ ] Update developer setup instructions
-- [ ] Add migration notes to project docs
+### Pre-Demo Review
+- [ ] All migrated components work correctly
+- [ ] All legacy components still functional
+- [ ] No console errors in browser
+- [ ] Application compiles without errors
+- [ ] Code includes educational comments
+- [ ] Documentation updated
 
-### Team Knowledge Transfer
-- [ ] Schedule team training on Signals
-- [ ] Share migration guide with team
-- [ ] Demonstrate new patterns
-- [ ] Answer team questions
-- [ ] Update onboarding documentation
+### Demo Readiness
+- [ ] Can explain standalone components
+- [ ] Can explain Signals
+- [ ] Can explain modern control flow  
+- [ ] Can explain inject() function
+- [ ] Can explain OnPush change detection
+- [ ] Can show before/after comparison
 
----
-
-## Phase 8: Deployment Preparation
-
-### Pre-Deployment
-- [ ] Create production build: `ng build --configuration production`
-- [ ] Test production build locally
-- [ ] Review build output and sizes
-- [ ] Ensure no build warnings
-- [ ] Create deployment checklist
-- [ ] Prepare rollback plan
-
-### Staging Deployment
-- [ ] Deploy to staging environment
-- [ ] Smoke test all critical paths
-- [ ] Performance test on staging
-- [ ] Security scan (if applicable)
-- [ ] Stakeholder review
-
-### Production Deployment
-- [ ] Schedule deployment window
-- [ ] Notify stakeholders
-- [ ] Deploy to production
-- [ ] Verify deployment success
-- [ ] Monitor for errors
-- [ ] Check performance metrics
+### Success Criteria ✓
+- [ ] 2 components migrated to Angular 20
+- [ ] 2 components kept as legacy examples
+- [ ] Hybrid architecture working
+- [ ] All features functional
+- [ ] Total time: 3-4 hours or less
+- [ ] Demo ready to present
 
 ---
 
-## Post-Migration
+## Time Tracking
 
-### Monitoring (First 24 Hours)
-- [ ] Monitor error logs
-- [ ] Check application performance
-- [ ] Review user feedback
-- [ ] Verify all features working
-- [ ] Check analytics for anomalies
-
-### Optimization (Optional)
-- [ ] Investigate zoneless configuration
-- [ ] Consider lazy loading routes
-- [ ] Optimize bundle size further
-- [ ] Implement performance improvements
-- [ ] Add PWA capabilities
-
-### Cleanup
-- [ ] Remove Angular 16 backup branches (after 30 days)
-- [ ] Update CI/CD pipelines
-- [ ] Archive migration documentation
-- [ ] Update team wiki/confluence
-
----
-
-## Final Checklist
-
-### Success Criteria
-- [ ] ✅ Application running on Angular 20
-- [ ] ✅ Zero NgModule files in codebase
-- [ ] ✅ All components standalone
-- [ ] ✅ All components use Signals
-- [ ] ✅ All DI uses `inject()` function
-- [ ] ✅ All templates use modern control flow
-- [ ] ✅ All tests passing (>95%)
-- [ ] ✅ Performance maintained or improved
-- [ ] ✅ No console errors
-- [ ] ✅ Bundle size reduced
-- [ ] ✅ Deployment successful
-- [ ] ✅ Team trained on new patterns
+| Phase | Estimated | Actual | Notes |
+|-------|-----------|--------|-------|
+| Phase 1: AppComponent | 30 min | _____ | |
+| Phase 2: AddTutorialComponent | 2 hrs | _____ | |
+| Phase 3: Legacy Markers | 15 min | _____ | |
+| Phase 4: Demo Validation | 30 min | _____ | |
+| **TOTAL** | **3-4 hrs** | **_____** | |
 
 ---
 
 ## Notes & Issues
 
-### Issues Encountered
-_Document any issues encountered during migration and their solutions:_
+Use this space to track any issues or important notes during migration:
 
-1. Issue: _________________________
-   Solution: _____________________
+```
+Issue #1:
 
-2. Issue: _________________________
-   Solution: _____________________
 
-### Lessons Learned
-_Document lessons learned for future migrations:_
+Resolution:
+
+
+Issue #2:
+
+
+Resolution:
+```
+
+---
+
+## Post-Demo Next Steps
+
+After successful demo, if proceeding with full migration:
+- [ ] Migrate TutorialsListComponent
+- [ ] Migrate TutorialDetailsComponent
+- [ ] Update TutorialService fully
+- [ ] Eliminate AppModule completely
+- [ ] Create standalone routing
+- [ ] Update main.ts to bootstrapApplication
+- [ ] Full test suite update
+- [ ] Production deployment
+
+**Full Migration Estimated:** Additional 12-16 hours
+
+---
+
+## Demo Completed ✓
+
+- [ ] Demo successfully presented
+- [ ] Stakeholder feedback collected
+- [ ] Decision made on full migration: YES / NO / LATER
+- [ ] Next steps documented
+
+**Completion Date:** _________________  
+**Completed By:** _________________  
+**Demo Result:** _________________
 
 1. _________________________________
 

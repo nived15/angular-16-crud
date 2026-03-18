@@ -1,6 +1,6 @@
 <div>
   <div class="submit-form">
-    <div *ngIf="!submitted">
+    @if (!submitted()) {
       <div class="form-group">
         <label for="title">Title</label>
         <input
@@ -8,7 +8,8 @@
           class="form-control"
           id="title"
           required
-          [(ngModel)]="tutorial.title"
+          [value]="tutorial().title"
+          (input)="updateTitle($any($event.target).value)"
           name="title"
         />
       </div>
@@ -19,17 +20,18 @@
           class="form-control"
           id="description"
           required
-          [(ngModel)]="tutorial.description"
+          [value]="tutorial().description"
+          (input)="updateDescription($any($event.target).value)"
           name="description"
         />
       </div>
 
       <button (click)="saveTutorial()" class="btn btn-success">Submit</button>
-    </div>
+    }
 
-    <div *ngIf="submitted">
+    @if (submitted()) {
       <h4>Tutorial was submitted successfully!</h4>
       <button class="btn btn-success" (click)="newTutorial()">Add</button>
-    </div>
+    }
   </div>
 </div>

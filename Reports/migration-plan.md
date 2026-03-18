@@ -77,79 +77,175 @@ This document provides a **simplified demo migration plan** for upgrading the An
 
 ## 🎯 Migration Strategy
 
-### Strategic Approach: "Incremental Modernization"
+### Demo Approach: "Selective Modernization"
 
-We will follow a **bottom-up, incremental migration** strategy that progresses through 8 distinct phases. Each phase has clear entry/exit criteria, deliverables, and validation checkpoints.
+We will follow a **targeted, demo-focused migration** strategy that progresses through 4 simplified phases. This approach migrates just enough to showcase Angular 20's key features while maintaining legacy code for comparison.
 
 ### Core Principles
 
-1. **Safety First:** Every phase includes rollback capability
-2. **Test-Driven:** All changes validated by tests before proceeding
-3. **Incremental Progress:** Small, verifiable steps rather than big-bang changes
-4. **Parallel Workstreams:** Independent tasks executed concurrently where possible
-5. **Continuous Validation:** Application remains functional after each phase
+1. **Demo-First:** Focus on showable Angular 20 features
+2. **Quick Implementation:** 3-4 hours total effort
+3. **Before/After Contrast:** Keep legacy components for comparison
+4. **Hybrid Architecture:** Demonstrate gradual migration path
+5. **Stakeholder Ready:** Clear, demonstrable value
 
-### Dependency Chain
+### Simplified Dependency Chain
 
 ```
-Phase 1: Preparation
+Phase 1: Preparation (30 min)
     ↓
-Phase 2: Angular Core Update (BLOCKING for all others)
+Phase 2: Standalone Components Migration (2.5 hrs)
+    ├── AppComponent
+    └── AddTutorialComponent
     ↓
-Phase 3: Component Migration (can parallelize individual components)
-    ├── AppComponent (must complete first)
-    ├── AddTutorialComponent (parallel with Lists/Details)
-    ├── TutorialsListComponent (parallel with Add/Details)
-    └── TutorialDetailsComponent (parallel with Add/Lists)
+Phase 3: Configuration Updates (30-45 min)
     ↓
-Phase 4: Module Elimination (depends on Phase 3 complete)
-    ↓
-Phase 5: Service Modernization (parallel with Phase 6)
-    ↓
-Phase 6: Zoneless Preparation (optional)
-    ↓
-Phase 7: Testing & QA (depends on all above)
-    ↓
-Phase 8: Documentation & Deployment
+Phase 4: Demo Validation & Documentation (30 min)
 ```
 
-### Migration Philosophy
+### Demo Philosophy
 
-**The "Signals-First" Mandate:**
-- Every property that changes MUST be a Signal
-- All `@Input()` becomes `input()`
-- All `@Output()` becomes `output()`
-- Observable-to-Signal conversion via `toSignal()`
-
-**The "Standalone-Only" Rule:**
-- No new NgModules will be created
-- All components converted to `standalone: true`
-- Modules deleted after components are standalone
-
-**The "Modern Control Flow" Requirement:**
-- Zero tolerance for `*ngIf`, `*ngFor`, `*ngSwitch`
-- 100% usage of `@if`, `@for`, `@switch`
-- All `@for` loops include `track` expression
+**The "Show Don't Tell" Approach:**
+- Migrate the simplest complete user flow (Add Tutorial)
+- Keep complex components as legacy examples
+- Create clear before/after comparisons
+- Document differences for training purposes
 
 ---
 
-## 📅 Detailed Phase Plan
+## 📅 Simplified Phase Plan (Demo)
 
-### **PHASE 1: Pre-Migration Preparation**
-**Duration:** 2-3 hours  
-**Owner:** Lead Developer  
-**Parallel Work:** None (must complete first)
+### **PHASE 1: Demo Preparation**
+**Duration:** 30 minutes  
+**Owner:** Developer  
 
 #### Objectives
-- Establish clean baseline for migration
-- Create safety nets for rollback
-- Validate current application state
-- Set up development environment
+- Quick baseline setup
+- Create safety net for rollback
+- Minimal preparation for demo
 
 #### Tasks Checklist
 
-- [ ] **1.1** Create full git backup of current codebase
-  - Create tag: `v1.0-angular-16-baseline`
+- [ ] **1.1** Create git branch: `git checkout -b demo/angular-20-migration`
+- [ ] **1.2** Verify current app runs: `ng serve`
+- [ ] **1.3** Test "Add Tutorial" functionality works
+- [ ] **1.4** Document current state (screenshot or video)
+
+#### Exit Criteria
+- ✅ Branch created
+- ✅ App running successfully
+- ✅ Baseline documented
+
+---
+
+### **PHASE 2: Component Migration**
+**Duration:** 2-2.5 hours  
+**Owner:** Developer
+
+#### Objectives
+- Migrate AppComponent to standalone
+- Migrate AddTutorialComponent to Angular 20 patterns
+- Demonstrate all key Angular 20 features
+
+#### Component 1: AppComponent (~30 min)
+
+- [ ] **2.1** Add `standalone: true`
+- [ ] **2.2** Add `imports: [RouterOutlet, CommonModule]`
+- [ ] **2.3** Add `changeDetection: ChangeDetectionStrategy.OnPush`
+- [ ] **2.4** Convert `title` to `signal('Angular 20 Demo - Hybrid Migration')`
+- [ ] **2.5** Update template to use `{{ title() }}`
+- [ ] **2.6** Test: Verify app loads
+
+#### Component 2: AddTutorialComponent (~2 hrs)
+
+- [ ] **2.7** Add `standalone: true`
+- [ ] **2.8** Add `imports: [FormsModule, CommonModule]`  
+- [ ] **2.9** Add `changeDetection: ChangeDetectionStrategy.OnPush`
+- [ ] **2.10** Replace constructor DI with `tutorialService = inject(TutorialService)`
+- [ ] **2.11** Convert `tutorial` to signal with proper structure
+- [ ] **2.12** Convert `submitted` to `signal(false)`
+- [ ] **2.13** Update `saveTutorial()` method to use signals correctly
+- [ ] **2.14** Update `newTutorial()` method to reset signals
+- [ ] **2.15** Update template:
+  - Replace `*ngIf` with `@if`
+  - Update all property references to signal reads
+  - Fix two-way binding with signals
+- [ ] **2.16** Test: Add tutorial functionality works
+- [ ] **2.17** Test: Form reset works
+- [ ] **2.18** Add comments explaining Angular 20 patterns
+
+#### Exit Criteria
+- ✅ Both components migrated and working
+- ✅ Add Tutorial feature fully functional
+- ✅ Code includes educational comments
+
+---
+
+### **PHASE 3: Configuration Updates**
+**Duration:** 30-45 minutes
+**Owner:** Developer
+
+#### Objectives
+- Update main.ts for hybrid bootstrapping
+- Update AppModule to import standalone components
+- Document component status
+
+#### Tasks Checklist
+
+- [ ] **3.1** Update AppModule:
+  - Remove AppComponent from declarations
+  - Import AppComponent in imports array
+  - Keep other components in declarations
+- [ ] **3.2** Update routing if needed
+- [ ] **3.3** Update tsconfig experimentalDecorators if needed
+- [ ] **3.4** Add TODO comments to legacy components:
+  ```typescript
+  // TODO: LEGACY COMPONENT - Not migrated (kept for demo comparison)
+  // See AddTutorialComponent for Angular 20 patterns
+  ```
+- [ ] **3.5** Test: Full app functionality
+- [ ] **3.6** Test: Navigation between migrated and legacy components
+
+#### Exit Criteria
+- ✅ Hybrid architecture working
+- ✅ All features functional
+- ✅ Clear documentation in code
+
+---
+
+### **PHASE 4: Demo Validation & Documentation**
+**Duration:** 30 minutes
+**Owner:** Developer
+
+#### Objectives
+- Validate demo scenarios
+- Create comparison documentation
+- Prepare presentation materials
+
+#### Tasks Checklist
+
+- [ ] **4.1** Test demo flow:
+  1. Show AppComponent code (Angular 20)
+  2. Show AddTutorialComponent code (Angular 20)  
+  3. Show TutorialsListComponent code (Angular 16 - legacy)
+  4. Highlight key differences
+- [ ] **4.2** Create side-by-side comparison document
+- [ ] **4.3** Update README with demo notes
+- [ ] **4.4** Document Angular 20 features showcased:
+  - Standalone components
+  - Signals
+  - Modern control flow
+  - inject() function
+  - OnPush change detection
+- [ ] **4.5** Take screenshots/record video of working demo
+- [ ] **4.6** Prepare talking points for presentation
+
+#### Exit Criteria
+- ✅ Demo validated and working
+- ✅ Documentation complete
+- ✅ Presentation ready
+
+---
   - Push to remote repository
   - Verify tag exists remotely
 

@@ -1,10 +1,22 @@
-# Component-by-Component Migration Guide
+# Component-by-Component Migration Guide (Demo Edition)
 
-This guide provides step-by-step instructions for migrating each component from Angular 16 to Angular 20 patterns.
+**Demo Scope:** This guide focuses on the 2 components selected for Angular 20 migration, with legacy examples provided for comparison.
+
+## Demo Migration Strategy
+
+### Components to MIGRATE (✅)
+1. **AppComponent** - Simple demonstration of standalone + signals (~30 min)
+2. **AddTutorialComponent** - Full demonstration of all Angular 20 patterns (~2 hrs)
+
+### Components to KEEP AS LEGACY (⚠️ Angular 16 Reference)
+3. **TutorialsListComponent** - Kept as before/after comparison example
+4. **TutorialDetailsComponent** - Kept as before/after comparison example
+
+**Purpose:** By migrating only 2 components, we create a perfect demonstration of Angular 20 features while maintaining legacy code for educational comparison. This reduces implementation time from 16-24 hours to 3-4 hours.
 
 ---
 
-## 1. AppComponent Migration
+## 1. AppComponent Migration (✅ MIGRATE THIS)
 
 ### Current Code (Angular 16)
 ```typescript
@@ -53,7 +65,11 @@ export class AppComponent {
 
 ---
 
-## 2. AddTutorialComponent Migration
+## 2. AddTutorialComponent Migration (✅ MIGRATE THIS)
+
+**Demo Priority:** HIGH - This component demonstrates all key Angular 20 features  
+**Time Estimate:** 2 hours  
+**Educational Value:** Best example for training and presentation
 
 ### Current Code (Angular 16)
 ```typescript
@@ -205,7 +221,42 @@ export class AddTutorialComponent {
 
 ---
 
-## 3. TutorialsListComponent Migration
+## 3. TutorialsListComponent (⚠️ KEEP AS LEGACY - DO NOT MIGRATE)
+
+**Demo Purpose:** Before/after comparison example  
+**Status:** Angular 16 - Leave untouched  
+**Educational Value:** Shows complex Angular 16 patterns for comparison  
+**Action Required:** Add TODO comment only
+
+### Add This Comment to Component File
+```typescript
+// TODO: LEGACY COMPONENT - Angular 16 Pattern (Not Migrated for Demo)
+// Kept for before/after comparison
+// See AddTutorialComponent for Angular 20 patterns
+// If full migration approved, this component would be migrated similarly
+```
+
+### What This Component Shows (Angular 16 Reference)
+
+This component demonstrates Angular 16 patterns that would be converted in a full migration:
+
+#### Current Angular 16 Patterns:
+- ❌ Module-based (not standalone)
+- ❌ Constructor-based dependency injection
+- ❌ Plain properties instead of signals
+- ❌ `*ngFor` instead of `@for`
+- ❌ Default change detection (not OnPush)
+
+#### What It Would Become (If Migrated):
+- ✅ `standalone: true`
+- ✅ `inject(TutorialService)`
+- ✅ All properties as signals
+- ✅ Template using `@for` with `track`
+- ✅ `ChangeDetectionStrategy.OnPush`
+
+### Current (Legacy) Code Example
+
+**DO NOT MODIFY** - Keep this as reference for comparison
 
 ### Current Code (Angular 16) - Simplified
 ```typescript
@@ -375,7 +426,42 @@ export class TutorialsListComponent implements OnInit {
 
 ---
 
-## 4. TutorialDetailsComponent Migration
+## 4. TutorialDetailsComponent (⚠️ KEEP AS LEGACY - DO NOT MIGRATE)
+
+**Demo Purpose:** Before/after comparison example  
+**Status:** Angular 16 - Leave untouched  
+**Educational Value:** Shows complex routing & @Input patterns  
+**Action Required:** Add TODO comment only
+
+### Add This Comment to Component File
+```typescript
+// TODO: LEGACY COMPONENT - Angular 16 Pattern (Not Migrated for Demo)
+// Kept for before/after comparison
+// See AddTutorialComponent for Angular 20 patterns
+// This component shows complex @Input usage that would become input() in Angular 20
+```
+
+### What This Component Shows (Angular 16 Reference)
+
+This component demonstrates advanced Angular 16 patterns that would be converted in a full migration:
+
+#### Current Angular 16 Patterns:
+- ❌ `@Input()` decorators for component inputs
+- ❌ Multiple constructor-injected dependencies
+- ❌ Traditional routing parameter access
+- ❌ Plain properties for state
+- ❌ Complex template with `*ngIf`
+
+#### What It Would Become (If Migrated):
+- ✅ `input()` function for inputs
+- ✅ `inject()` for all dependencies
+- ✅ Signal-based state management
+- ✅ `@if` in templates
+- ✅ Computed signals for derived state
+
+### Current (Legacy) Code Example
+
+**DO NOT MODIFY** - Keep this as reference for training and comparison
 
 ### Current Code (Angular 16) - Simplified
 ```typescript

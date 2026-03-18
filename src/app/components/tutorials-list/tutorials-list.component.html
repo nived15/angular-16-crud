@@ -5,7 +5,8 @@
         type="text"
         class="form-control"
         placeholder="Search by title"
-        [(ngModel)]="title"
+        [value]="title()"
+        (input)="updateSearchTitle($any($event.target).value)"
       />
       <div class="input-group-append">
         <button
@@ -21,14 +22,15 @@
   <div class="col-md-6">
     <h4>Tutorials List</h4>
     <ul class="list-group">
-      <li
-        class="list-group-item"
-        *ngFor="let tutorial of tutorials; let i = index"
-        [class.active]="i == currentIndex"
-        (click)="setActiveTutorial(tutorial, i)"
-      >
-        {{ tutorial.title }}
-      </li>
+      @for (tutorial of tutorials(); track tutorial.id || $index; let i = $index) {
+        <li
+          class="list-group-item"
+          [class.active]="i === currentIndex()"
+          (click)="setActiveTutorial(tutorial, i)"
+        >
+          {{ tutorial.title }}
+        </li>
+      }
     </ul>
 
     <button class="m-3 btn btn-sm btn-danger" (click)="removeAllTutorials()">
@@ -38,7 +40,7 @@
   <div class="col-md-6">
     <app-tutorial-details
       [viewMode]="true"
-      [currentTutorial]="currentTutorial"
+      [currentTutorial]="currentTutorial()"
     ></app-tutorial-details>
   </div>
 </div>

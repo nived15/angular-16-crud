@@ -1,33 +1,47 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, input, signal, inject, effect } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { RouterLink, ActivatedRoute, Router } from '@angular/router';
 import { TutorialService } from 'src/app/services/tutorial.service';
-import { ActivatedRoute, Router } from '@angular/router';
 import { Tutorial } from 'src/app/models/tutorial.model';
 
 @Component({
   selector: 'app-tutorial-details',
   templateUrl: './tutorial-details.component.html',
   styleUrls: ['./tutorial-details.component.css'],
+  standalone: true,
+  imports: [FormsModule, RouterLink],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TutorialDetailsComponent implements OnInit {
-  @Input() viewMode = false;
-
-  @Input() currentTutorial: Tutorial = {
+  private tutorialService = inject(TutorialService);
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  
+  viewMode = input(false);
+  currentTutorial = input<Tutorial>({
     title: '',
     description: '',
     published: false
-  };
+  });
 
-  message = '';
+  internalTutorial = signal<Tutorial>({
+    title: '',
+    description: '',
+    published: false
+  });
+  
+  message = signal('');
 
-  constructor(
-    private tutorialService: TutorialService,
-    private route: ActivatedRoute,
-    private router: Router
-  ) {}
+  constructor() {
+    // Sync input signal to internal signal
+    effect(() => {
+      this.internalTutorial.set(this.currentTutorial());
+    });
+  }
 
   ngOnInit(): void {
-    if (!this.viewMode) {
-      this.message = '';
+    if (!this.viewMode()) {
+      this.message.set('');
       this.getTutorial(this.route.snapshot.params['id']);
     }
   }
@@ -35,7 +49,7 @@ export class TutorialDetailsComponent implements OnInit {
   getTutorial(id: string): void {
     this.tutorialService.get(id).subscribe({
       next: (data) => {
-        this.currentTutorial = data;
+        this.internalTutorial.set(data);
         console.log(data);
       },
       error: (e) => console.error(e)
@@ -44,48 +58,52 @@ export class TutorialDetailsComponent implements OnInit {
 
   updatePublished(status: boolean): void {
     const data = {
-      title: this.currentTutorial.title,
-      description: this.currentTutorial.description,
+      title: this.internalTutorial().title,
+      description: this.internalTutorial().description,
       published: status
     };
 
-    this.message = '';
+    this.message.set('');
 
-    this.tutorialService.update(this.currentTutorial.id, data).subscribe({
+    this.tutorialService.update(this.internalTutorial().id, data).subscribe({
       next: (res) => {
         console.log(res);
-        this.currentTutorial.published = status;
-        this.message = res.message
-          ? res.message
-          : 'The status was updated successfully!';
+        this.internalTutorial.update(t => ({ ...t, published: status }));
+        this.message.set(res.message || 'The status was updated successfully!');
       },
       error: (e) => console.error(e)
     });
   }
 
   updateTutorial(): void {
-    this.message = '';
+    this.message.set('');
 
     this.tutorialService
-      .update(this.currentTutorial.id, this.currentTutorial)
+      .update(this.internalTutorial().id, this.internalTutorial())
       .subscribe({
         next: (res) => {
           console.log(res);
-          this.message = res.message
-            ? res.message
-            : 'This tutorial was updated successfully!';
+          this.message.set(res.message || 'This tutorial was updated successfully!');
         },
         error: (e) => console.error(e)
       });
   }
 
   deleteTutorial(): void {
-    this.tutorialService.delete(this.currentTutorial.id).subscribe({
+    this.tutorialService.delete(this.internalTutorial().id).subscribe({
       next: (res) => {
         console.log(res);
         this.router.navigate(['/tutorials']);
       },
       error: (e) => console.error(e)
     });
+  }
+
+  updateTitle(value: string): void {
+    this.internalTutorial.update(t => ({ ...t, title: value }));
+  }
+
+  updateDescription(value: string): void {
+    this.internalTutorial.update(t => ({ ...t, description: value }));
   }
 }
